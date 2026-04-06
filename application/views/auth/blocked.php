@@ -25,9 +25,6 @@
                                         </h1>
                                         <p class="mb-4">You don't have permission to access this page.</p>
                                         <p class="text-muted small">Please contact administrator if you think this is an error.</p>
-                                        <a href="<?= base_url('dashboard'); ?>" class="btn btn-primary btn-user">
-                                            <i class="fas fa-arrow-left fa-sm"></i> Back to Dashboard
-                                        </a>
                                     </div>
                                 </div>
                             </div>

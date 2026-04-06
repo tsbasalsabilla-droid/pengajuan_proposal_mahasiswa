@@ -4,14 +4,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Datados_model extends CI_Model
 {
     protected $table = 'dosen';
-    protected $column_order = [null, 'id_dosen', 'NIDN', 'nama_dos', 'gelar', null];
-    protected $column_search = ['id_dosen', 'NIDN', 'nama_dos', 'gelar'];
+    protected $column_order = [null, 'id_dosen', 'nidn', 'nama_dos', 'gelar', null];
+    protected $column_search = ['id_dosen', 'nidn', 'nama_dos', 'gelar'];
 
     protected $order = ['id_dosen' => 'asc'];
 
     private function _get_datatables_query()
     {
-        $this->db->select('id_dosen, NIDN, nama_dos, gelar');
+        $this->db->select('id_dosen, nidn, nama_dos, gelar');
         $this->db->from($this->table);
 
         if (!empty($_POST['search']['value'])) {
@@ -60,5 +60,20 @@ class Datados_model extends CI_Model
     public function get_all()
     {
         return $this->db->get($this->table)->result();
+    }
+
+    public function get_by_id($id)
+    {
+        return $this->db->get_where($this->table, ['id_dosen' => $id])->row();
+    }
+
+    public function update($id, $data)
+    {
+        return $this->db->update($this->table, $data, ['id_dosen' => $id]);
+    }
+
+    public function delete($id)
+    {
+        return $this->db->delete($this->table, ['id_dosen' => $id]);
     }
 }

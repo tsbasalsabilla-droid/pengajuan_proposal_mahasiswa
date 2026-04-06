@@ -1,4 +1,4 @@
- <!-- Sidebar -->
+<!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
@@ -38,11 +38,10 @@
             <!-- SIAPKAN SUB MENU SESUAI MENU -->
              <?php 
              $menuid = $m['id'];
-             $querysubmenu = "SELECT *
-                             FROM `user_sub_menu` JOIN `user_menu`
-                               ON `user_sub_menu`.`menu_id` = `user_menu`.`id`
-                            WHERE `user_sub_menu`.`menu_id` = $menuid
-                              AND `user_sub_menu`.`is_active` = 1
+             $querysubmenu = "SELECT usm.*
+                             FROM `user_sub_menu` usm
+                            WHERE usm.`menu_id` = $menuid
+                              AND usm.`is_active` = 1
                          ";
 
              $submenu = $this->db->query($querysubmenu)->result_array();            
@@ -58,8 +57,8 @@
                     <?php endif; ?>
 
                 <a class="nav-link pb-0" href="<?= base_url($sm['url']); ?>">
-                    <i class="<?= $sm['icon']; ?>"></i>
-                    <span><?= $sm['title']; ?></span></a>
+                <i class="<?= $sm['icon']; ?>"></i>
+                <span><?= $sm['title']; ?></span></a>
             </li>
 
                 <?php endforeach; ?>

@@ -10,37 +10,26 @@ class Mahasiswa extends CI_Controller {
         $this->load->helper('url');
         $this->load->database();
         
-        // Cek apakah ada session email, kalau tidak ada, tendang ke halaman login
+        // SIMPLE CHECK - NO HELPER NEEDED
         if (!$this->session->userdata('email')) {
             redirect('auth');
-        } else {
-            // Kalau sudah login, cek rolenya punya akses ke menu ini tidak?
-            $role_id = $this->session->userdata('role_id');
-            
-            // Ambil nama menu dari URL (segmen ke-1, misal: 'mahasiswa')
-            $menu = $this->uri->segment(1);
-
-            // Cari ID menu tersebut di database
-            $queryMenu = $this->db->get_where('user_menu', ['menu' => $menu])->row_array();
-            $menu_id = $queryMenu['id'];
-
-            // Cek ke tabel user_access_menu
-            $userAccess = $this->db->get_where('user_access_menu', [
-                'role_id' => $role_id,
-                'menu_id' => $menu_id
-            ]);
-
-            // Jika tidak ada baris yang cocok, berarti dia tidak punya akses
-            if ($userAccess->num_rows() < 1) {
-                redirect('auth/blocked');
-            }
+        }
+        
+        // CHECK IF USER IS MAHASISWA (role_id = 2)
+        $role_id = $this->session->userdata('role_id');
+        if ($role_id != 2) {
+            redirect('auth/blocked');
         }
     }
 
     public function index()
     {
-        $data['title'] = 'Pengajuan Proposal';
-        
+        // Redirect ke dashboard untuk menjaga konsistensi URL
+        redirect('mahasiswa/dashboard');
+    }
+
+    public function pengajuan()
+    {
         // Ambil data user dari database berdasarkan session
         $email = $this->session->userdata('email');
         $user_data = $this->db->get_where('user', ['email' => $email])->row_array();

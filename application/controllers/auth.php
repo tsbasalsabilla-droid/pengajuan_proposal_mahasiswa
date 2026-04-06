@@ -40,63 +40,43 @@ public function index()
     }
     }
 
-    private function _login()
-    {
-        $email =$this->input->post('user_email');
-        $password = $this->input->post('user_password'); 
+    private function _login() {
+    $email = $this->input->post('user_email');
+    $password = $this->input->post('user_password'); 
 
-        $user = $this->db->get_where('user', ['email' => $email])->row_array();
-        
-        if($user) {
-            //usernya aktif 
-
-            if($user['is_active'] == 1) {
-                //cek password 
-                if(password_verify($password, $user['password'])){
-                    $data =[
-                        'email' => $user['email'], 
-                        'role_id' => $user['role_id'],
-                        'nama' => $user['name']
-                    ];
-                    $this->session->set_userdata($data);
+    $user = $this->db->get_where('user', ['email' => $email])->row_array();
+    
+    if($user) {
+        if($user['is_active'] == 1) {
+            if(password_verify($password, $user['password'])){
+                $data = [
+                    'email' => $user['email'], 
+                    'role_id' => $user['role_id'],
+                    'nama' => $user['name']
+                ];
+                $this->session->set_userdata($data);
                 
-                // AUTO-CREATE DATA DOSEN JIKA BELUM ADA (tanpa NIDN dan gelar)
-                if($user['role_id'] == 3) {
-                    $dosen_check = $this->db->get_where('dosen', ['user_id' => $user['id']])->row_array();
-                    if (!$dosen_check) {
-                        $this->db->insert('dosen', [
-                            'user_id' => $user['id'],
-                            'nidn' => NULL, // kosongkan, diisi manual nanti
-                            'nama_dos' => $user['name'],
-                            'gelar' => NULL // kosongkan, diisi manual nanti
-                        ]);
-                    }
-                }
-                
+                // REDIRECT BERDASARKAN ROLE
                 if($user['role_id'] == 1){
-                        redirect('http://localhost/pengajuan_proposal/dashboard'); // redirect ke dashboard admin
-                    } elseif($user['role_id'] == 3) {
-                        redirect('http://localhost/pengajuan_proposal/dosen'); // redirect ke dashboard dosen
-                    } else {
-                        redirect('http://localhost/pengajuan_proposal/mahasiswa/dashboard'); // redirect ke dashboard mahasiswa
-                    }
-                }else{
-                    $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Wrong password!</div>');
-            redirect('auth');
+                    redirect('admin'); // Sesuaikan nama controller Adminmu
+                } elseif($user['role_id'] == 3) {
+                    redirect('dosen'); // Role 3 ke Controller Dosen (Dashboard)
+                } else {
+                    redirect('mahasiswa'); // Role 2 ke Controller Mahasiswa (langsung ke index)
                 }
-
-            }else{
-                $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">This email has not be activated! </div>');
-            redirect('auth');
+            } else {
+                $this->session->set_flashdata('message', '<div class="alert alert-danger">Wrong password!</div>');
+                redirect('auth');
             }
-
-
-        }else {
-            //usernya ga ada
-            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">email is not registered!</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger">Email not active!</div>');
             redirect('auth');
         }
+    } else {
+        $this->session->set_flashdata('message', '<div class="alert alert-danger">Email not registered!</div>');
+        redirect('auth');
     }
+}
 
     public function registration()
     {
@@ -119,7 +99,7 @@ public function index()
             $email = $this->input->post('user_email');
             $name = htmlspecialchars($this->input->post('user_name', true));
             $password = password_hash($this->input->post('user_password1'), PASSWORD_DEFAULT);
-            $role_id = 2; // Default mahasiswa
+            $role_id = 2; // Mahasiswa (Sesuai role_id di databasemu)
 
             // 1. INSERT ke tabel user
             $user_insert = $this->db->insert('user', [
@@ -161,6 +141,7 @@ public function index()
             $this->session->unset_userdata('email');
             $this->session->unset_userdata('role_id');
             $this->session->unset_userdata('nama');
+            $this->session->sess_destroy(); // Wajib ada ini biar session hancur total
 
             $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">You have been logged out!</div>');
             redirect('http://localhost/pengajuan_proposal/auth');
@@ -170,4 +151,3 @@ public function index()
             $this->load->view('auth/blocked');
         }
     }
-

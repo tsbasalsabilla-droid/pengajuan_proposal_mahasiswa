@@ -29,7 +29,7 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
             <span class="nav-text">Dashboard</span>
         </a>
 
-        <a href="index" class="nav-item <?= $current_page === 'pengajuan' ? 'active' : '' ?>">
+        <a href="pengajuan" class="nav-item <?= $current_page === 'pengajuan' ? 'active' : '' ?>">
             <span class="nav-icon">
                 <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 3A1.5 1.5 0 001 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0115 5.293V4.5A1.5 1.5 0 0013.5 3h-11z"/><path d="M15 6.954L8.978 9.86a2.25 2.25 0 01-1.956 0L1 6.954V11.5A1.5 1.5 0 002.5 13h11a1.5 1.5 0 001.5-1.5V6.954z"/></svg>
             </span>
@@ -54,11 +54,12 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
     <nav class="nav-group">
         <div class="nav-label">Akun</div>
         
-        <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('Auth/logout') ?>">
-                <i class="fas fa-fw fa-sign-out-alt"></i>
-                <span>Logout</span></a>
-        </li>
+        <a href="<?= base_url('auth/logout') ?>" class="nav-item">
+            <span class="nav-icon">
+                <svg viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg>
+            </span>
+            <span class="nav-text">Logout</span>
+        </a>
 
     <!-- Footer: User Info -->
     <div class="sidebar-footer">

@@ -15,7 +15,7 @@ class Datasiswa_model extends CI_Model
         $this->db->from('mahasiswa');
         $this->db->join('prodi', 'prodi.id_prodi = mahasiswa.prodi_id', 'left');
 
-        if (!empty($_POST['search']['value'])) {
+        if (isset($_POST['search']['value']) && $_POST['search']['value'] != '') {
             $this->db->group_start();
             foreach ($this->column_search as $item) {
                 $this->db->or_like($item, $_POST['search']['value']);
@@ -23,7 +23,7 @@ class Datasiswa_model extends CI_Model
             $this->db->group_end();
         }
 
-        if (isset($_POST['order'])) {
+        if (isset($_POST['order'][0]['column'])) {
             $colIdx = (int) $_POST['order'][0]['column'];
             $dir = $_POST['order'][0]['dir'] === 'asc' ? 'asc' : 'desc';
             $column = $this->column_order[$colIdx] ?? key($this->order);
@@ -38,7 +38,7 @@ class Datasiswa_model extends CI_Model
     public function get_datatables()
     {
         $this->_get_datatables_query();
-        if (isset($_POST['length']) && $_POST['length'] != -1) {
+        if (isset($_POST['length']) && isset($_POST['start']) && $_POST['length'] != -1) {
             $this->db->limit((int) $_POST['length'], (int) $_POST['start']);
         }
         $query = $this->db->get();

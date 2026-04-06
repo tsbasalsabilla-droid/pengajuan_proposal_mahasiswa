@@ -59,7 +59,7 @@
           </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Simpan</button>
+          <button type="button" class="btn btn-primary btn-simpan-dosen">Simpan</button>
         </div>
       </form>
     </div>
@@ -68,39 +68,34 @@
 
 
 <!-- Modal: Edit Prodi -->
-    <div class="modal fade" id="editdosModal" tabindex="-1" role="dialog" aria-labelledby="editdosModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editdosModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="editdosModalLabel">Edit Dosen</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            </button>
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Data Dosen</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="formEditDos">
+                <input type="hidden" name="e_id_dosen" id="e_id_dosen">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>NIDN</label>
+                        <input type="text" class="form-control" name="e_nidn" id="e_nidn" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Dosen</label>
+                        <input type="text" class="form-control" name="e_nama_dos" id="e_nama_dos" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gelar</label>
+                        <input type="text" class="form-control" name="e_gelar" id="e_gelar" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary btn-update-dosen">Simpan Perubahan</button>
+                </div>
+            </form>
         </div>
-        <form id="formEditDos">
-            <input type="hidden" name="id_dosen" id="e_id_dosen">
-            <div class="modal-body">
-            <div class="form-group">
-                <label for="e_nidn">NIDN</label>
-                <input type="text" class="form-control" id="e_nidn" name="nidn" required>
-                <small class="text-danger pl-1" id="err_e_nidn"></small>
-            </div>
-            <div class="form-group">
-                <label for="e_nama_dos">Nama dosen</label>
-                <input type="text" class="form-control" id="e_nama_dos" name="nama_dos" required>
-                <small class="text-danger pl-1" id="err_nama_dos"></small>
-            </div>
-            <div class="form-group">
-                <label for="e_gelar">Gelar</label>
-                <input type="text" class="form-control" id="e_gelar" name="gelar" required>
-                <small class="text-danger pl-1" id="err_gelar"></small>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Simpan</button>
-            </div>
-        </form>
-        </div>
-    </div>
     </div>
 </div>
