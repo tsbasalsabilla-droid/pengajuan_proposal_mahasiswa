@@ -258,27 +258,27 @@ public function getverifrow()
 
     public function updatestatus()
 {
+    if (ob_get_length()) ob_clean();
+    header('Content-Type: application/json');
+    
     $id = $this->input->post('id');
     $status = $this->input->post('status');
 
-    $this->db->where('id', $id);
-    $this->db->update('pengajuan_proposal', [
-        'status' => $status
-    ]);
-
-    echo json_encode(['status' => true]);
-}
-
-    public function deleteverifrow()
-    {
-        $id = (int)$this->input->post('id');
-        if ($id) {
-            $this->db->delete('pengajuan_proposal', ['id' => $id]);
-            echo json_encode(['status' => true]);
-        } else {
-            echo json_encode(['status' => false, 'message' => 'ID tidak valid']);
-        }
+    if (!$id || !$status) {
+        echo json_encode(['status' => false, 'message' => 'ID atau status tidak valid']);
+        exit;
     }
+
+    $this->db->where('id', $id);
+    $update = $this->db->update('pengajuan_proposal', ['status' => $status]);
+
+    if ($update) {
+        echo json_encode(['status' => true]);
+    } else {
+        echo json_encode(['status' => false, 'message' => 'Gagal update status']);
+    }
+    exit;
+}
 
     public function getverif()
     {

@@ -18,23 +18,33 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $i = 1; foreach($proposal as $p) : ?>
-                        <tr>
-                            <td><?= $i++; ?></td>
-                            <td><?= $p['nim']; ?></td>
-                            <td><?= $p['judul']; ?></td>
-                            <td><a href="<?= $p['link']; ?>" target="_blank" class="badge badge-info">Lihat File</a></td>
-                            <td>
-                                <?php if($p['status'] == 'Pending') : ?>
-                                    <span class="badge badge-warning">Pending</span>
-                                <?php elseif($p['status'] == 'Disetujui') : ?>
-                                    <span class="badge badge-success">Disetujui</span>
-                                <?php else : ?>
-                                    <span class="badge badge-danger">Ditolak</span>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                        <?php if(!empty($proposal)): ?>
+                            <?php $i = 1; foreach($proposal as $p): ?>
+                            <tr>
+                                <td><?= $i++; ?></td>
+                                <td><?= $p['nim']; ?></td>
+                                <td><?= $p['judul']; ?></td>
+                                <td><a href="<?= $p['link']; ?>" target="_blank" class="badge badge-info">Lihat File</a></td>
+                                <td>
+                                    <button type="button" 
+                                            class="btn-status-fiks <?php 
+                                                $status = $p['status'] ?? 'Pending'; 
+                                                $warna = 'bg-pending';
+                                                if ($status === 'Disetujui') $warna = 'bg-setuju';
+                                                if ($status === 'Ditolak') $warna = 'bg-ditolak';
+                                                echo $warna; 
+                                            ?> btn-status" 
+                                            data-id="<?= $p['id']; ?>">
+                                        <?= $status; ?>
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" class="text-center">Tidak ada data proposal</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
