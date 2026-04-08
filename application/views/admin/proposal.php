@@ -1,3 +1,19 @@
+<style>
+#datatable-daftar_wrapper .dataTables_filter {
+    float: none !important;
+    text-align: left !important;
+}
+#datatable-daftar_wrapper .dataTables_paginate {
+    float: none !important;
+    text-align: left !important;
+}
+<style>
+#datatable-daftar_wrapper .dataTables_filter {
+    float: none !important;
+    text-align: left !important;
+}
+</style>
+
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800"><?= $title; ?></h1>
 
@@ -18,33 +34,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if(!empty($proposal)): ?>
-                            <?php $i = 1; foreach($proposal as $p): ?>
-                            <tr>
-                                <td><?= $i++; ?></td>
-                                <td><?= $p['nim']; ?></td>
-                                <td><?= $p['judul']; ?></td>
-                                <td><a href="<?= $p['link']; ?>" target="_blank" class="badge badge-info">Lihat File</a></td>
-                                <td>
-                                    <button type="button" 
-                                            class="btn-status-fiks <?php 
-                                                $status = $p['status'] ?? 'Pending'; 
-                                                $warna = 'bg-pending';
-                                                if ($status === 'Disetujui') $warna = 'bg-setuju';
-                                                if ($status === 'Ditolak') $warna = 'bg-ditolak';
-                                                echo $warna; 
-                                            ?> btn-status" 
-                                            data-id="<?= $p['id']; ?>">
-                                        <?= $status; ?>
-                                    </button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="5" class="text-center">Tidak ada data proposal</td>
-                            </tr>
-                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -57,14 +46,15 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Verifikasi Proposal</h5>
-                <button class="close" type="button" data-dismiss="modal"><span>×</span></button>
+                <button class="close" type="button" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body text-center">
-                <p>Tentukan status untuk proposal ini:</p>
                 <input type="hidden" id="status_id">
-                <button onclick="updateStatus('Disetujui')" class="btn btn-success">Setujui</button>
-                <button onclick="updateStatus('Ditolak')" class="btn btn-danger">Tolak</button>
-                <button onclick="updateStatus('Pending')" class="btn btn-warning">Pending</button>
+                <p>Tentukan status untuk proposal ini:</p>
+                <div class="d-flex justify-content-center" style="gap: 10px;">
+                    <button class="btn btn-success" onclick="updateStatus('Disetujui')">Setuju</button>
+                    <button class="btn btn-danger" onclick="updateStatus('Ditolak')">Tolak</button>
+                </div>
             </div>
         </div>
     </div>

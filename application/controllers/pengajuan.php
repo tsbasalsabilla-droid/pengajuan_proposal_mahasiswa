@@ -95,7 +95,7 @@ $data['dosen_list'] = $this->db->get('dosen')->result_array();
             echo json_encode(['status' => true, 'message' => 'Pengajuan Proposal berhasil ditambahkan!']);
         } else {
             $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Pengajuan Proposal berhasil ditambahkan!</div>');
-            redirect('pengajuan/daftar_pengajuan');
+            redirect('pengajuan/daftar');
         }
     }
 }
@@ -173,9 +173,25 @@ public function getdaftarrow()
         foreach ($list as $row) {
             $no++;
             
-            // Status dibuat bisa diklik untuk memicu Modal
-            $status_color = ($row->status == 'Disetujui') ? 'success' : (($row->status == 'Ditolak') ? 'danger' : 'warning');
-            $status_badge = '<a href="javascript:void(0)" class="badge badge-'.$status_color.' btn-status" data-id="'.$row->id.'">'.$row->status.'</a>';
+            // Status badge dengan logic yang lebih baik
+            $status_text = !empty($row->status) ? $row->status : 'Pending';
+            $status_color = 'secondary'; // Default abu-abu
+            
+            if ($status_text == 'Disetujui') {
+                $status_color = 'success';
+            } elseif ($status_text == 'Ditolak') {
+                $status_color = 'danger';
+            } elseif ($status_text == 'Pending') {
+                $status_color = 'warning';
+            }
+
+            $status_badge = '
+<a href="javascript:void(0)" 
+   class="badge badge-'.$status_color.' btn-status" 
+   data-id="'.$row->id.'" 
+   style="font-size:13px; padding:6px 12px; border-radius:5px; cursor:pointer; text-decoration:none;">
+   '.$status_text.'
+</a>';
             
             $data[] = [
                 'no'          => $no,
@@ -256,29 +272,26 @@ public function getverifrow()
         echo json_encode($row ?: []);
     }
 
-    public function updatestatus()
-{
-    if (ob_get_length()) ob_clean();
-    header('Content-Type: application/json');
-    
-    $id = $this->input->post('id');
-    $status = $this->input->post('status');
+    public function updatestatus() {
+        $id = $this->input->post('id');
+        $status = $this->input->post('status');
+        
+        if (!$id || !$status) {
+            echo json_encode(['status' => false, 'message' => 'Data tidak lengkap']);
+            return;
+        }
 
-    if (!$id || !$status) {
-        echo json_encode(['status' => false, 'message' => 'ID atau status tidak valid']);
-        exit;
+        $this->db->where('id', $id);
+        $update = $this->db->update('pengajuan_proposal', ['status' => $status]);
+        
+        // Kirim JSON
+        header('Content-Type: application/json');
+        if ($update) {
+            echo json_encode(['status' => true, 'message' => 'Status berhasil diubah jadi ' . $status]);
+        } else {
+            echo json_encode(['status' => false, 'message' => 'Gagal update database']);
+        }
     }
-
-    $this->db->where('id', $id);
-    $update = $this->db->update('pengajuan_proposal', ['status' => $status]);
-
-    if ($update) {
-        echo json_encode(['status' => true]);
-    } else {
-        echo json_encode(['status' => false, 'message' => 'Gagal update status']);
-    }
-    exit;
-}
 
     public function getverif()
     {
@@ -290,20 +303,38 @@ public function getverifrow()
 
         foreach ($list as $row) {
             $no++;
-            $status_class = $row->status == 'sudah disetujui' ? 'success' : 'danger';
+            
+            // Status badge dengan logic yang lebih baik
+            $status_text = !empty($row->status) ? $row->status : 'pending';
+            $status_compare = strtolower($status_text); // Kecilkan semua buat perbandingan
+            
+            if ($status_compare == 'disetujui' || $status_compare == 'setuju') {
+                $status_color = 'success';
+            } elseif ($status_compare == 'ditolak') {
+                $status_color = 'danger';
+            } else {
+                $status_color = 'warning';
+            }
+
+            $status_badge = '
+<a href="javascript:void(0)" 
+   class="badge badge-'.$status_color.' btn-status" 
+   data-id="'.$row->id.'" 
+   style="font-size:13px; padding:6px 12px; border-radius:5px; cursor:pointer; text-decoration:none;">
+   '.$status_text.'
+</a>';
+            
+            // Format link untuk ditampilkan sebagai badge
+            $link_badge = '<a href="'.$row->link.'" target="_blank" class="badge badge-info">Lihat Berkas</a>';
             
             $data[] = [
                 'no'          => $no,
-                'nim'  => $row->nim,
-                'nama'  => $row->nama,
-                'judul'  => $row->judul,
-                'link'     => $row->link,
+                'nim'         => $row->nim,
+                'nama'        => $row->nama,
+                'judul'       => $row->judul,
+                'link'        => $link_badge,
                 'tanggal'     => $row->tanggal,
-                'status' => '<span class="badge badge-'.$status_class.' btn-status" 
-    data-id="'.$row->id.'" 
-    style="cursor:pointer;">
-    '.$row->status.'
-</span>',
+                'status'      => $status_badge
             ];
         }
 

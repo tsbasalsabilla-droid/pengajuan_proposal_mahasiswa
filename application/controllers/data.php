@@ -213,5 +213,22 @@ class Data extends CI_Controller
         echo json_encode(['status' => true]);
     }
 
+    public function updatemahasiswa()
+    {
+        if (ob_get_length()) ob_clean();
+        header('Content-Type: application/json');
+
+        $id = $this->input->post('id_mahasiswa');
+        $data = [
+            'nim'      => $this->input->post('nim'),
+            'nama'     => $this->input->post('nama'),
+            'prodi_id' => $this->input->post('prodi_id'),
+        ];
+
+        $this->db->update('mahasiswa', $data, ['id_mahasiswa' => $id]);
+        echo json_encode(['status' => true]);
+        exit;
+    }
+
     public function test() { echo "MASUK DATA CONTROLLER"; }
 }

@@ -36,228 +36,219 @@
 <script src="<?= base_url('assets/'); ?>vendor/datatables/dataTables.bootstrap4.min.js"></script>
 <script src="<?= base_url('assets/'); ?>js/sb-admin-2.min.js"></script>
 
-<style>
-    /* CSS FIX: Menjamin teks terlihat dan tombol punya ukuran */
-    .btn-status-fiks {
-        display: inline-block !important;
-        padding: 7px 14px !important;
-        font-size: 11px !important;
-        font-weight: 800 !important;
-        line-height: 1 !important;
-        text-align: center !important;
-        white-space: nowrap !important;
-        vertical-align: middle !important;
-        cursor: pointer !important;
-        border-radius: 50px !important; /* Biar lebih modern (pill) */
-        border: none !important;
-        min-width: 100px !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    /* Warna Background & Teks */
-    .bg-pending { background-color: #ffc107 !important; color: #212529 !important; }
-    .bg-setuju  { background-color: #28a745 !important; color: #ffffff !important; }
-    .bg-ditolak { background-color: #dc3545 !important; color: #ffffff !important; }
-
-    /* Fix tabel agar tidak melar ke samping */
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    table.dataTable {
-        border-collapse: collapse !important;
-        width: 100% !important;
-    }
-</style>
-
+<!-- SCRIPT: Update Status Proposal -->
 <script>
-    function updateStatus(status) {
-        let id = $('#status_id').val();
-        if(!id) return alert("ID tidak valid!");
+function updateStatus(status) {
+    let csrfName = '<?= $this->security->get_csrf_token_name(); ?>';
+    let csrfHash = '<?= $this->security->get_csrf_hash(); ?>';
+    let id = $('#status_id').val();
 
-        $.ajax({
-            url: "<?= base_url('pengajuan/updatestatus'); ?>",
-            type: "POST",
-            data: { id: id, status: status },
-            dataType: "json",
-            beforeSend: function() {
-                // Opsional: tambahkan loading
-            },
-            success: function(res) {
-                // res.status harus true dari controller PHP
-                if (res.status == true || res.status == "true") { 
-                    $('#statusModal').modal('hide');
-                    // Reload tabel tanpa reset posisi halaman
-                    if ($.fn.DataTable.isDataTable('#datatable-daftar')) {
+    $.ajax({
+        url: "<?= base_url('pengajuan/updatestatus'); ?>",
+        type: 'POST',
+        data: { [csrfName]: csrfHash, id: id, status: status },
+        success: function(response) {
+            let res = typeof response === 'string' ? JSON.parse(response) : response;
+            if (res.status) {
+                $('#statusModal').modal('hide');
+                setTimeout(function() {
+                    if ($.fn.DataTable.isDataTable('#tableVerif')) {
+                        $('#tableVerif').DataTable().ajax.reload(null, false);
+                    } else if ($.fn.DataTable.isDataTable('#datatable-daftar')) {
                         $('#datatable-daftar').DataTable().ajax.reload(null, false);
+                    } else {
+                        location.reload();
                     }
-                    alert('Status Berhasil Diperbarui!');
-                } else {
-                    alert('Gagal update: ' + (res.message || 'Cek Controller PHP'));
-                }
+                }, 300);
+            } else {
+                alert('Gagal: ' + res.message);
+            }
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+            alert('Terjadi kesalahan sistem.');
+        }
+    });
+}
+
+$(document).on('click', '.btn-status', function(e) {
+    e.preventDefault();
+    let id = $(this).data('id');
+    $('#status_id').val(id);
+    $('#statusModal').modal('show');
+});
+</script>
+
+<!-- SCRIPT: DataTables -->
+<script>
+$(document).ready(function () {
+
+    // ===================== DAFTAR PROPOSAL =====================
+    if ($('#datatable-daftar').length) {
+        $('#datatable-daftar').DataTable({
+            processing: true,
+            serverSide: true,
+            order: [],
+            ajax: {
+                url: '<?= base_url("pengajuan/getdaftar") ?>',
+                type: 'POST'
             },
-            error: function(xhr) {
-                console.log(xhr.responseText);
-                alert('Error Server! Cek Console (F12)');
+            columns: [
+                { data: 'no' },
+                { data: 'nim' },
+                { data: 'judul' },
+                { data: 'berkas' },
+                { data: 'status' }
+            ],
+            columnDefs: [
+                { targets: [0, 3, 4], orderable: false }
+            ]
+        });
+    }
+
+    // ===================== DATA DOSEN =====================
+    if ($('#datatable-datados').length) {
+        var tableDos = $('#datatable-datados').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '<?= base_url("data/getdatados") ?>',
+                type: 'POST'
+            },
+            columns: [
+                { data: 'no' },
+                { data: 'nidn' },
+                { data: 'nama_dos' },
+                { data: 'gelar' },
+                { data: 'aksi', orderable: false, searchable: false }
+            ]
+        });
+
+        // Tambah dosen
+        $('.btn-simpan-dosen').on('click', function () {
+            $.ajax({
+                url: '<?= base_url("data/datados") ?>',
+                type: 'POST',
+                data: $('#formAddDosen').serialize(),
+                success: function () {
+                    $('#newDosenModal').modal('hide');
+                    $('#formAddDosen')[0].reset();
+                    tableDos.ajax.reload();
+                }
+            });
+        });
+
+        // Buka modal edit dosen
+        $('#datatable-datados tbody').on('click', '.btn-edit-dosen', function () {
+            var id = $(this).data('id');
+            $.ajax({
+                url: '<?= base_url("data/getdatadosrow") ?>',
+                type: 'POST',
+                data: { id: id },
+                success: function (res) {
+                    var data = typeof res === 'string' ? JSON.parse(res) : res;
+                    $('#e_id_dosen').val(data.id_dosen);
+                    $('#e_nidn').val(data.nidn);
+                    $('#e_nama_dos').val(data.nama_dos);
+                    $('#e_gelar').val(data.gelar);
+                    $('#editdosModal').modal('show');
+                }
+            });
+        });
+
+        // Update dosen
+        $('.btn-update-dosen').on('click', function () {
+            $.ajax({
+                url: '<?= base_url("data/updatedatadosrow") ?>',
+                type: 'POST',
+                data: $('#formEditDos').serialize(),
+                success: function () {
+                    $('#editdosModal').modal('hide');
+                    tableDos.ajax.reload();
+                }
+            });
+        });
+
+        // Delete dosen
+        $('#datatable-datados tbody').on('click', '.btn-delete-dosen', function () {
+            var id = $(this).data('id');
+            if (confirm('Yakin hapus data dosen ini?')) {
+                $.ajax({
+                    url: '<?= base_url("data/deletedatadosrow") ?>',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function () {
+                        tableDos.ajax.reload();
+                    }
+                });
             }
         });
     }
 
-    $(document).ready(function() {
-        if ($('#datatable-daftar').length) {
-            var table = $('#datatable-daftar').DataTable({
-                "processing": true,
-                "serverSide": true,
-                "responsive": true,
-                "ajax": {
-                    "url": "<?= base_url('pengajuan/getdaftar'); ?>",
-                    "type": "POST"
-                },
-                "columns": [
-                    { "data": "no" },
-                    { "data": "nim" },
-                    { "data": "judul" },
-                    { "data": "berkas" },
-                    { 
-                        "data": "status",
-                        "render": function(data, type, row) {
-                            // LOGIKA DEFAULT PENDING
-                            let label = (data === null || data === '' || data === undefined) ? 'PENDING' : data.toUpperCase();
-                            
-                            let warna = 'bg-pending';
-                            if (label === 'SETUJU') warna = 'bg-setuju';
-                            if (label === 'DITOLAK') warna = 'bg-ditolak';
-
-                            // Gunakan row.id_proposal (sesuaikan dengan nama kolom di DB kamu)
-                            let proposalID = row.id_proposal || row.id;
-
-                            return `<button type="button" 
-                                        class="btn-status-fiks ${warna} btn-status" 
-                                        data-id="${proposalID}">
-                                        ${label}
-                                    </button>`;
-                        }
-                    }
-                ]
-            });
-        }
-
-        // Gunakan EVENT DELEGATION untuk tombol di dalam DataTable
-        $(document).on('click', '.btn-status', function(e) {
-            e.preventDefault();
-            let id = $(this).attr('data-id');
-            $('#status_id').val(id); // Pastikan input ini ada di modal!
-            $('#statusModal').modal('show');
+    // ===================== DATA MAHASISWA =====================
+    if ($('#datatable-datasiswa').length) {
+        var tableSiswa = $('#datatable-datasiswa').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '<?= base_url("data/getdatasiswa") ?>',
+                type: 'POST'
+            },
+            columns: [
+                { data: 'no' },
+                { data: 'nim' },
+                { data: 'nama' },
+                { data: 'nama_prodi' },
+                { data: 'aksi', orderable: false, searchable: false }
+            ]
         });
 
-        // DataTable untuk Data Dosen
-        if ($('#datatable-datados').length) {
-            $('#datatable-datados').DataTable({
-                "processing": true,
-                "serverSide": true,
-                "responsive": true,
-                "ajax": {
-                    "url": "<?= base_url('data/getdatados'); ?>",
-                    "type": "POST"
-                },
-                "columns": [
-                    { "data": "no" },
-                    { "data": "nidn" },
-                    { "data": "nama_dos" },
-                    { "data": "gelar" },
-                    { "data": "aksi" }
-                ]
-            });
-        }
-
-        // DataTable untuk Data Mahasiswa
-        if ($('#datatable-datasiswa').length) {
-            $('#datatable-datasiswa').DataTable({
-                "processing": true,
-                "serverSide": true,
-                "responsive": true,
-                "ajax": {
-                    "url": "<?= base_url('data/getdatasiswa'); ?>",
-                    "type": "POST"
-                },
-                "columns": [
-                    { "data": "no" },
-                    { "data": "nim" },
-                    { "data": "nama" },
-                    { "data": "nama_prodi" },
-                    { "data": "aksi" }
-                ]
-            });
-        }
-
-        // JavaScript untuk Data Mahasiswa AJAX
-        $(document).on('click', '.btn-edit-siswa', function(e) {
-            e.preventDefault();
-            let id = $(this).data('id');
+        // Buka modal edit mahasiswa
+        $('#datatable-datasiswa tbody').on('click', '.btn-edit-siswa', function () {
+            var id = $(this).data('id');
             $.ajax({
-                url: "<?= base_url('data/getdatamahasiswarow'); ?>",
-                type: "POST",
+                url: '<?= base_url("data/getdatamahasiswarow") ?>',
+                type: 'POST',
                 data: { id: id },
-                success: function(res) {
-                    $('#e_id_siswa').val(res.id_mahasiswa);
-                    $('#e_nim').val(res.nim);
-                    $('#e_nama_siswa').val(res.nama);
-                    $('#e_prodi_id').val(res.prodi_id);
+                success: function (res) {
+                    var data = typeof res === 'string' ? JSON.parse(res) : res;
+                    $('#e_id_siswa').val(data.id_mahasiswa);
+                    $('#e_nim').val(data.nim);
+                    $('#e_nama_siswa').val(data.nama);
+                    $('#e_prodi_id').val(data.prodi_id);
                     $('#editsiswaModal').modal('show');
                 }
             });
         });
 
-        $(document).on('click', '.btn-delete-siswa', function(e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                let id = $(this).data('id');
+        // Delete mahasiswa
+        $('#datatable-datasiswa tbody').on('click', '.btn-delete-siswa', function () {
+            var id = $(this).data('id');
+            if (confirm('Yakin hapus data mahasiswa ini?')) {
                 $.ajax({
-                    url: "<?= base_url('data/deletedatasiswarow'); ?>",
-                    type: "POST",
+                    url: '<?= base_url("data/deletedatasiswarow") ?>',
+                    type: 'POST',
                     data: { id: id },
-                    success: function(res) {
-                        if (res.status) {
-                            $('#datatable-datasiswa').DataTable().ajax.reload(null, false);
-                        }
+                    success: function () {
+                        tableSiswa.ajax.reload();
                     }
                 });
             }
         });
 
-        // JavaScript untuk Data Dosen AJAX
-        $(document).on('click', '.btn-edit-dosen', function(e) {
-            e.preventDefault();
-            let id = $(this).data('id');
+        // Update mahasiswa
+        $('.btn-update-siswa').on('click', function () {
             $.ajax({
-                url: "<?= base_url('data/getdatadosrow'); ?>",
-                type: "POST",
-                data: { id: id },
-                success: function(res) {
-                    $('#e_id_dosen').val(res.id_dosen);
-                    $('#e_nidn').val(res.nidn);
-                    $('#e_nama_dos').val(res.nama_dos);
-                    $('#e_gelar').val(res.gelar);
-                    $('#editDosenModal').modal('show');
+                url: '<?= base_url("data/updatemahasiswa") ?>',
+                type: 'POST',
+                data: $('#formEditSiswa').serialize(),
+                success: function () {
+                    $('#editsiswaModal').modal('hide');
+                    tableSiswa.ajax.reload();
                 }
             });
         });
+    }
 
-        $(document).on('click', '.btn-delete-dosen', function(e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                let id = $(this).data('id');
-                $.ajax({
-                    url: "<?= base_url('data/deletedatadosrow'); ?>",
-                    type: "POST",
-                    data: { id: id },
-                    success: function(res) {
-                        if (res.status) {
-                            $('#datatable-datados').DataTable().ajax.reload(null, false);
-                        }
-                    }
-                });
-            }
-        });
-    });
+});
 </script>

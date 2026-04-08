@@ -1,4 +1,4 @@
-  <!-- Begin Page Content -->
+<!-- Begin Page Content -->
   <div class="container-fluid">
 
     <!-- Page Heading -->
@@ -107,4 +107,55 @@
           </div>
       </div>
       </div>
+
+<script type="text/javascript">
+    var table;
+    $(document).ready(function() {
+        // Inisialisasi DataTables
+        $('#datatable-daftar').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "order": [],
+            "ajax": {
+                "url": "<?php echo base_url('pengajuan/getdaftar')?>",
+                "type": "POST"
+                // Jika pakai CSRF, tambahkan data token di sini seperti diskusi sebelumnya
+            },
+            "columns": [
+                { "data": "no" },
+                { "data": "nim" },
+                { "data": "judul" },
+                { "data": "berkas" },
+                { "data": "status" }
+            ],
+            "columnDefs": [
+                { 
+                    "targets": [0, 3, 4], 
+                    "orderable": false 
+                }
+            ]
+        });
+    });
+</script>
+
+<!-- Tambahkan modal status ke daftar_pengajuan.php (sebelum tag </div> penutup container) -->
+<div class="modal fade" id="statusModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ubah Status Proposal</h5>
+                <button class="close" type="button" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body text-center">
+                <input type="hidden" id="status_id">
+                <p>Tentukan status untuk proposal ini:</p>
+                <div class="d-flex justify-content-center" style="gap: 10px;">
+                    <button class="btn btn-warning" onclick="updateStatus('Pending')">Pending</button>
+                    <button class="btn btn-success" onclick="updateStatus('Disetujui')">Disetujui</button>
+                    <button class="btn btn-danger" onclick="updateStatus('Ditolak')">Ditolak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
       </div>
