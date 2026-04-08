@@ -185,10 +185,6 @@
                 <div class="page-title">Pengajuan Proposal</div>
                 <div class="page-sub">Selamat datang, <?= $this->session->userdata('nama'); ?></div>
             </div>
-            <button class="btn-primary">
-                <svg class="icon" viewBox="0 0 14 14"><path d="M7 1v12M1 7h12"/></svg>
-                Ajukan Proposal
-            </button>
         </div>
 
         <div class="alert-info">

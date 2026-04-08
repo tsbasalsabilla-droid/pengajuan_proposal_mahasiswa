@@ -126,7 +126,7 @@
                     <div class="page-title">Dashboard</div>
                     <div class="page-sub">Selamat datang, <?= $this->session->userdata('nama'); ?></div>
                 </div>
-                <a href="<?= base_url('mahasiswa/index'); ?>" class="btn-primary" style="text-decoration: none;">
+                <a href="<?= base_url('mahasiswa/pengajuan'); ?>" class="btn-primary" style="text-decoration: none;">
                     <svg class="icon" viewBox="0 0 14 14"><path d="M7 1v12M1 7h12"/></svg>
                     Ajukan Proposal
                 </a>
