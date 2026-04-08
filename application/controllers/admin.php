@@ -67,10 +67,15 @@ class Admin extends CI_Controller {
         // Ambil data role spesifik
         $data['role'] = $this->db->get_where('user_role', ['id' => $role_id])->row_array();
 
-        // Ambil semua menu kecuali menu 'Admin' agar admin tidak sengaja mengunci diri sendiri
-        $this->db->where('id !=', 4); 
-        $data['menu'] = $this->db->get('user_menu')->result_array();
-
+        // Ambil semua submenu yang active (ini yang 5 submenu)
+        $this->db->select('usm.*, um.menu as menu_name');
+        $this->db->from('user_sub_menu usm');
+        $this->db->join('user_menu um', 'usm.menu_id = um.id', 'left');
+        $this->db->where('usm.is_active', 1);
+        $this->db->order_by('um.menu', 'ASC');
+        $this->db->order_by('usm.title', 'ASC');
+        $data['submenu'] = $this->db->get()->result_array();
+        
         $this->load->view('templates/headeradmin', $data);
         $this->load->view('templates/sidebaradmin', $data);
         $this->load->view('templates/topbar', $data);
@@ -101,7 +106,6 @@ class Admin extends CI_Controller {
         $menu_id = $this->input->post('menuId');
         $role_id = $this->input->post('roleId');
 
-
         $data = [
             'role_id' => $role_id,
             'menu_id' => $menu_id
@@ -111,10 +115,19 @@ class Admin extends CI_Controller {
 
         if ($result->num_rows() < 1) {
             $this->db->insert('user_access_menu', $data);
+            $action = 'inserted';
         } else {
             $this->db->delete('user_access_menu', $data);
+            $action = 'deleted';
         }
 
-        $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Access Changed!</div>');
+        // Return JSON response for AJAX
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => true,
+            'action' => $action,
+            'message' => 'Access berhasil diubah'
+        ]);
+        exit;
     }
 }
