@@ -1,12 +1,10 @@
-<footer class="sticky-footer bg-white">
+<footer class="bg-white py-3" style="position: fixed; bottom: 0; left: 224px; right: 0; z-index: 1;">
     <div class="container my-auto">
         <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Web Pengajuan Proposal Mahasiswa <?= date('Y'); ?></span>
+            <span style="font-size: 12px;">Copyright &copy; Web Pengajuan Proposal Mahasiswa <?= date('Y'); ?></span>
         </div>
     </div>
 </footer>
-</div>
-</div>
 
 <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>

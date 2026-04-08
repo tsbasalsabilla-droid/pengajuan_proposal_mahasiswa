@@ -48,20 +48,26 @@
              ?>
 
 
-                <?php foreach($submenu as $sm) : ?>
+                <?php 
+$current_url = $this->uri->uri_string(); // ambil URL saat ini
+?>
 
-                    <?php if($title == $sm['title']) : ?>
-                        <li class="nav-item active">
-                    <?php else : ?>
-                        <li class="nav-item">
-                    <?php endif; ?>
+<?php foreach($submenu as $sm) : ?>
 
-                <a class="nav-link pb-0" href="<?= base_url($sm['url']); ?>">
-                <i class="<?= $sm['icon']; ?>"></i>
-                <span><?= $sm['title']; ?></span></a>
-            </li>
+    <?php 
+    // Cek berdasarkan URL, lebih reliable dari title
+    $is_active = (trim($current_url, '/') == trim($sm['url'], '/'));
+    ?>
 
-                <?php endforeach; ?>
+    <li class="nav-item <?= $is_active ? 'active' : '' ?>">
+        <a class="nav-link pb-0" href="<?= base_url($sm['url']); ?>">
+            <i class="<?= $sm['icon']; ?>"></i>
+            <span><?= $sm['title']; ?></span>
+        </a>
+    </li>
+
+<?php endforeach; ?>
+
 
                 <hr class="sidebar-divider mt-3">
 
