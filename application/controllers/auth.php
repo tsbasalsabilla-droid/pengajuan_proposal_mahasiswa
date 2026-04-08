@@ -60,7 +60,7 @@ public function index()
                 if($user['role_id'] == 1){
                     redirect('admin'); // Sesuaikan nama controller Adminmu
                 } elseif($user['role_id'] == 3) {
-                    redirect('dosen'); // Role 3 ke Controller Dosen (Dashboard)
+                    redirect('admin'); // Role 3 ke Controller Dosen (Dashboard)
                 } else {
                     redirect('mahasiswa'); // Role 2 ke Controller Mahasiswa (langsung ke index)
                 }
@@ -112,7 +112,6 @@ public function index()
 
             if ($user_insert) {
                 $user_id = $this->db->insert_id();
-                log_message('debug', 'User berhasil dibuat dengan ID: ' . $user_id);
 
                 // 2. MASUKKAN ke tabel mahasiswa (data minimal)
                 $mahasiswa_insert = $this->db->insert('mahasiswa', [
@@ -122,14 +121,11 @@ public function index()
                 ]);
 
                 if ($mahasiswa_insert) {
-                    log_message('debug', 'Data mahasiswa berhasil dibuat untuk user_id: ' . $user_id);
                     $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Congratulation! your account has been created. Please login.</div>');
                 } else {
-                    log_message('error', 'Gagal membuat data mahasiswa: ' . $this->db->error());
                     $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Error creating mahasiswa data.</div>');
                 }
             } else {
-                log_message('error', 'Gagal membuat user: ' . $this->db->error());
                 $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Error creating user account.</div>');
             }
             

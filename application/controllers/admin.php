@@ -101,8 +101,6 @@ class Admin extends CI_Controller {
         $menu_id = $this->input->post('menuId');
         $role_id = $this->input->post('roleId');
 
-        // Debug: Log received data
-        log_message('debug', 'Received: menuId=' . $menu_id . ', roleId=' . $role_id);
 
         $data = [
             'role_id' => $role_id,
@@ -113,10 +111,8 @@ class Admin extends CI_Controller {
 
         if ($result->num_rows() < 1) {
             $this->db->insert('user_access_menu', $data);
-            log_message('debug', 'Inserted access for role_id=' . $role_id . ', menu_id=' . $menu_id);
         } else {
             $this->db->delete('user_access_menu', $data);
-            log_message('debug', 'Deleted access for role_id=' . $role_id . ', menu_id=' . $menu_id);
         }
 
         $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Access Changed!</div>');

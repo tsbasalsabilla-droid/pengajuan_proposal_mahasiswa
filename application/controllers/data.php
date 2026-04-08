@@ -230,5 +230,4 @@ class Data extends CI_Controller
         exit;
     }
 
-    public function test() { echo "MASUK DATA CONTROLLER"; }
-}
+    }

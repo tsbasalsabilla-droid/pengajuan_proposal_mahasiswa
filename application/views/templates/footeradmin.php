@@ -63,7 +63,6 @@ function updateStatus(status) {
             }
         },
         error: function(xhr) {
-            console.log(xhr.responseText);
             alert('Terjadi kesalahan sistem.');
         }
     });
