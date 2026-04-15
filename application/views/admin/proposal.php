@@ -38,7 +38,6 @@
     text-align: center;
 }
 
-/* Pastikan teks tidak terpotong */
 #datatable-daftar td {
     word-wrap: break-word;
     white-space: normal;
@@ -65,6 +64,7 @@
         <th scope="col">NIM</th>
         <th scope="col">Judul Proposal</th>
         <th scope="col">Berkas</th>
+        <th scope="col">Komentar</th>
         <th scope="col">Status</th>
       </tr>
     </thead>
@@ -84,12 +84,24 @@
             </div>
             <div class="modal-body text-center">
                 <input type="hidden" id="status_id">
+                <input type="hidden" id="selected_status">
                 <p>Tentukan status untuk proposal ini:</p>
-                <div class="d-flex justify-content-center" style="gap: 10px;">
-                    <button class="btn btn-success" onclick="updateStatus('Disetujui')">Setuju</button>
-                    <button class="btn btn-danger" onclick="updateStatus('Ditolak')">Tolak</button>
-                </div>
+                 <div class="d-flex justify-content-center mb-3" style="gap: 10px;">
+        <button class="btn btn-success" onclick="pilihStatus('Disetujui')">Setuju</button>
+        <button class="btn btn-danger" onclick="pilihStatus('Ditolak')">Tolak</button>
+    </div>
+
+    <!-- Komentar -->
+    <div class="form-group text-left">
+        <label for="komentar">Komentar</label>
+        <textarea id="komentar" class="form-control" rows="3" disabled placeholder="Pilih status dulu..."></textarea>
+    </div>
+
+    <!-- Tombol simpan -->
+    <button class="btn btn-primary mt-2" onclick="updateStatus()">Simpan</button>
+</div>
             </div>
+            
         </div>
     </div>
 </div>

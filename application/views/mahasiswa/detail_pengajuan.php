@@ -112,6 +112,13 @@
                         </div>
                     </div>
 
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 8px;">Komentar Admin</label>
+                        <div id="proposalKomentar" style="background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #666; font-size: 14px; line-height: 1.6;">
+                            <?= $proposal ? (!empty($proposal->komentar) ? htmlspecialchars($proposal->komentar) : 'Belum ada komentar') : 'Belum ada komentar' ?>
+                        </div>
+                    </div>
+
                     <div style="margin-bottom: 10px;">
                         <label style="display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 8px;">Status Validasi</label>
                         <span id="proposalStatus" class="status-badge" style="
@@ -197,6 +204,10 @@
                 if (proposal.dosen3) dosenList.push(proposal.dosen3);
                 dosenContainer.innerHTML = dosenList.length > 0 ? dosenList.join('<br>') : 'Tidak ada dosen pembimbing';
                 
+                // Update komentar
+                const komentarContainer = document.getElementById('proposalKomentar');
+                komentarContainer.innerHTML = proposal.komentar ? proposal.komentar : 'Belum ada komentar';
+                
                 // Update status
                 const statusContainer = document.getElementById('proposalStatus');
                 const statusText = document.getElementById('statusText');
@@ -234,6 +245,7 @@
                     </div>
                 `;
                 document.getElementById('proposalDosen').textContent = 'Tidak ada dosen pembimbing';
+                document.getElementById('proposalKomentar').innerHTML = 'Belum ada komentar';
             }
         });
     </script>

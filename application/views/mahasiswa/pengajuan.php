@@ -194,6 +194,8 @@
             </svg>
             <?php if ($sudah_disetujui): ?>
                 Selamat! Proposal Anda sudah disetujui. Anda tidak dapat mengajukan proposal baru.
+            <?php elseif ($ada_pending): ?>
+                Anda masih memiliki proposal yang sedang diproses. Harap tunggu hingga proposal tersebut disetujui atau ditolak sebelum mengajukan yang baru.
             <?php elseif ($sudah_pengajuan): ?>
                 Kamu sudah mengajukan proposal sebelumnya. Tinjau statusnya sebelum mengajukan yang baru.
             <?php else: ?>
@@ -201,7 +203,7 @@
             <?php endif; ?>
         </div>
 
-        <?php if (!$sudah_disetujui): ?>
+        <?php if ($bisa_mengajukan): ?>
         <div class="card">
             <form action="<?= base_url('mahasiswa/submit_pengajuan'); ?>" method="post">
             <div class="card-head">

@@ -11,7 +11,7 @@ class Daftar_model extends CI_Model
 
     private function _get_datatables_query()
     {
-        $this->db->select('pengajuan_proposal.id, pengajuan_proposal.nim, pengajuan_proposal.judul, pengajuan_proposal.link, pengajuan_proposal.dosen1, pengajuan_proposal.dosen2, pengajuan_proposal.dosen3, pengajuan_proposal.status, pengajuan_proposal.tanggal');
+        $this->db->select('pengajuan_proposal.id, pengajuan_proposal.nim, pengajuan_proposal.judul, pengajuan_proposal.link, pengajuan_proposal.dosen1, pengajuan_proposal.dosen2, pengajuan_proposal.dosen3, pengajuan_proposal.status, pengajuan_proposal.tanggal, pengajuan_proposal.komentar');
         $this->db->from('pengajuan_proposal');
 
         if (!empty($_POST['search']['value'])) {

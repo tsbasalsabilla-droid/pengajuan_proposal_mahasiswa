@@ -81,6 +81,13 @@ class Mahasiswa extends CI_Controller {
         $proposal_query = $this->db->get_where('pengajuan_proposal', ['nim' => $data['user']->nim]);
         $data['sudah_pengajuan'] = $proposal_query->num_rows() > 0;
         
+        // Cek apakah user masih memiliki proposal yang pending
+        $pending_proposal = $this->db->get_where('pengajuan_proposal', [
+            'nim' => $data['user']->nim,
+            'status' => 'Pending'
+        ])->num_rows();
+        $data['ada_pending'] = $pending_proposal > 0;
+        
         // Cek apakah user sudah memiliki proposal yang disetujui
         $approved_disetujui = $this->db->get_where('pengajuan_proposal', [
             'nim' => $data['user']->nim,
@@ -93,6 +100,9 @@ class Mahasiswa extends CI_Controller {
         ])->num_rows();
         
         $data['sudah_disetujui'] = ($approved_disetujui > 0 || $approved_sudah > 0);
+        
+        // Mahasiswa bisa mengajukan jika tidak ada pending dan belum disetujui
+        $data['bisa_mengajukan'] = !$data['ada_pending'] && !$data['sudah_disetujui'];
         
         $data['css'] = 'pengajuan';
 
@@ -136,6 +146,12 @@ class Mahasiswa extends CI_Controller {
         if ($mahasiswa_data) {
             $nim = $mahasiswa_data['nim'];
             
+            // Validasi: Cek apakah mahasiswa masih memiliki proposal yang pending
+            $pending_proposal = $this->db->get_where('pengajuan_proposal', [
+                'nim' => $nim,
+                'status' => 'Pending'
+            ])->num_rows();
+            
             // Validasi: Cek apakah mahasiswa sudah memiliki proposal yang disetujui
             $approved_proposal_disetujui = $this->db->get_where('pengajuan_proposal', [
                 'nim' => $nim,
@@ -146,6 +162,12 @@ class Mahasiswa extends CI_Controller {
                 'nim' => $nim,
                 'status' => 'sudah disetujui'
             ])->num_rows();
+            
+            if ($pending_proposal > 0) {
+                $this->session->set_flashdata('message', '<div class="alert alert-danger">Anda masih memiliki proposal yang sedang diproses. Harap tunggu hingga proposal tersebut selesai diproses.</div>');
+                redirect('mahasiswa/dashboard');
+                return;
+            }
             
             if ($approved_proposal_disetujui > 0 || $approved_proposal_sudah > 0) {
                 $this->session->set_flashdata('message', '<div class="alert alert-danger">Anda tidak dapat mengajukan proposal baru karena sudah memiliki proposal yang disetujui.</div>');
@@ -262,6 +284,7 @@ class Mahasiswa extends CI_Controller {
                     'dosen2' => $dosen2,
                     'dosen3' => $dosen3,
                     'status' => $proposal_data['status'],
+                    'komentar' => $proposal_data['komentar'],
                     'tanggal' => $proposal_data['tanggal']
                 ];
             }

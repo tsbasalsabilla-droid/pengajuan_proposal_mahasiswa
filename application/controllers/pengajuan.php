@@ -304,6 +304,7 @@ public function getverifrow()
         
         $id = $this->input->post('id');
         $status = $this->input->post('status');
+        $komentar = $this->input->post('komentar');
         
         if (!$id || !$status) {
             echo json_encode(['status' => false, 'message' => 'Data tidak lengkap']);
@@ -312,7 +313,7 @@ public function getverifrow()
 
         // Update database
         $this->db->where('id', $id);
-        $update = $this->db->update('pengajuan_proposal', ['status' => $status]);
+        $update = $this->db->update('pengajuan_proposal', ['status' => $status, 'komentar' => $komentar]);
         
         if ($update) {
             echo json_encode(['status' => true, 'message' => 'Status berhasil diubah']);

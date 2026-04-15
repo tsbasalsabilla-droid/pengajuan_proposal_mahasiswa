@@ -146,6 +146,7 @@ class Admin extends CI_Controller {
                 'nim'         => $row->nim,
                 'judul'       => $row->judul,
                 'berkas'      => '<a href="'.$row->link.'" target="_blank" class="badge badge-info">Lihat Berkas</a>',
+                'komentar'    => !empty($row->komentar) ? htmlspecialchars($row->komentar) : '-',
                 'status'      => $status_badge
             ];
         }

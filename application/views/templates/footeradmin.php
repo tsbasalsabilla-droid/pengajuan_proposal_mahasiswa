@@ -36,21 +36,48 @@
 
 <!-- SCRIPT: Update Status Proposal -->
 <script>
-function updateStatus(status) {
+    function pilihStatus(status) {
+    $('#selected_status').val(status);
+
+    // aktifkan textarea
+    $('#komentar').prop('disabled', false);
+
+    if (status === 'Ditolak') {
+        $('#komentar').attr('placeholder', 'Komentar wajib diisi karena ditolak!');
+    } else {
+        $('#komentar').attr('placeholder', 'Komentar (opsional)');
+    }
+}
+
+function updateStatus() {
     let id = $('#status_id').val();
+    let status = $('#selected_status').val();
+    let komentar = $('#komentar').val();
 
     console.log('UPDATE STATUS - ID:', id, 'Status:', status);
+
+    if (!status) {
+        alert('Pilih status dulu!');
+        return;
+    }
+
+    if (status === 'Ditolak' && komentar.trim() === '') {
+        alert('Komentar wajib diisi jika menolak!');
+        return;
+    }
 
     $.ajax({
         url: "<?= base_url('pengajuan/updatestatus'); ?>",
         type: 'POST',
-        data: { id: id, status: status },
+        data: { id: id, status: status, komentar: komentar },
         success: function(response) {
             console.log('UPDATE STATUS - Response:', response);
             let res = typeof response === 'string' ? JSON.parse(response) : response;
             if (res.status) {
                 console.log('UPDATE STATUS - Success:', res.message);
                 $('#statusModal').modal('hide');
+                $('#komentar').val('').prop('disabled', true);
+            $('#selected_status').val('');
                 setTimeout(function() {
                     // Cek semua DataTables yang ada dan reload
                     if ($.fn.DataTable.isDataTable('#datatable-daftar')) {
@@ -64,6 +91,10 @@ function updateStatus(status) {
                     if (!$.fn.DataTable.isDataTable('#datatable-daftar') && !$.fn.DataTable.isDataTable('#tableVerif')) {
                         console.log('UPDATE STATUS - No DataTables found, reloading page');
                         location.reload();
+                    }
+                    if (status === 'Ditolak' && komentar.trim() === '') {
+                        alert('Komentar wajib diisi jika menolak!');
+                        return;
                     }
                 }, 300);
             } else {
@@ -99,18 +130,19 @@ $(document).ready(function () {
         var ajaxUrl = '';
         
         // Konfigurasi berdasarkan jumlah kolom
-        if (columnCount === 5) {
-            // Untuk admin/proposal.php (5 kolom)
+        if (columnCount === 6) {
+            // Untuk admin/proposal.php (6 kolom)
             columnsConfig = [
                 { data: 'no' },
                 { data: 'nim' },
                 { data: 'judul' },
                 { data: 'berkas' },
+                { data: 'komentar' },
                 { data: 'status' }
             ];
             ajaxUrl = '<?= base_url("admin/getproposals") ?>';
-        } else if (columnCount === 10) {
-            // Untuk pengajuan/daftar_pengajuan.php (10 kolom)
+        } else if (columnCount === 5) {
+            // Untuk admin/proposal.php lama (5 kolom)
             columnsConfig = [
                 { data: 'no' },
                 { data: 'nim' },
