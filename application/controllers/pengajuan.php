@@ -164,11 +164,17 @@ public function getdaftarrow()
 
     public function getdaftar()
     {
+        header('Content-Type: application/json');
+        
         $this->load->model('daftar_model');
 
         $list = $this->daftar_model->get_datatables();
         $data = [];
         $no = isset($_POST['start']) ? (int)$_POST['start'] : 0;
+        
+        // Debug: Cek apakah ada data
+        error_log("Jumlah data dari model: " . count($list));
+        error_log("Total records: " . $this->daftar_model->count_all());
 
         foreach ($list as $row) {
             $no++;
@@ -193,12 +199,33 @@ public function getdaftarrow()
    '.$status_text.'
 </a>';
             
+            // Ambil nama dosen dari tabel dosen
+            $dosen1 = $this->db->get_where('dosen', ['id_dosen' => $row->dosen1])->row('nama_dos') ?? '-';
+            $dosen2 = $this->db->get_where('dosen', ['id_dosen' => $row->dosen2])->row('nama_dos') ?? '-';
+            $dosen3 = $this->db->get_where('dosen', ['id_dosen' => $row->dosen3])->row('nama_dos') ?? '-';
+            
+            // Tombol aksi
+            $aksi = '
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-warning btn-edit-daftar" data-id="'.$row->id.'">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-danger btn-delete-daftar" data-id="'.$row->id.'">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>';
+            
             $data[] = [
                 'no'          => $no,
                 'nim'         => $row->nim,
                 'judul'       => $row->judul,
                 'berkas'      => '<a href="'.$row->link.'" target="_blank" class="badge badge-info">Lihat Berkas</a>',
-                'status'      => $status_badge
+                'dosen1'      => $dosen1,
+                'dosen2'      => $dosen2,
+                'dosen3'      => $dosen3,
+                'status'      => $status_badge,
+                'tanggal'     => $row->tanggal ?? '-',
+                'aksi'        => $aksi
             ];
         }
 
@@ -273,6 +300,8 @@ public function getverifrow()
     }
 
     public function updatestatus() {
+        header('Content-Type: application/json');
+        
         $id = $this->input->post('id');
         $status = $this->input->post('status');
         
@@ -281,13 +310,12 @@ public function getverifrow()
             return;
         }
 
+        // Update database
         $this->db->where('id', $id);
         $update = $this->db->update('pengajuan_proposal', ['status' => $status]);
         
-        // Kirim JSON
-        header('Content-Type: application/json');
         if ($update) {
-            echo json_encode(['status' => true, 'message' => 'Status berhasil diubah jadi ' . $status]);
+            echo json_encode(['status' => true, 'message' => 'Status berhasil diubah']);
         } else {
             echo json_encode(['status' => false, 'message' => 'Gagal update database']);
         }

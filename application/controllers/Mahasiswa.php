@@ -178,50 +178,54 @@ class Mahasiswa extends CI_Controller {
             }
         }
 
-        // Ambil data proposal terakhir dari user yang sedang login
+        // Ambil semua data proposal dari user yang sedang login
         $this->db->order_by('tanggal', 'DESC');
-        $proposal_query = $this->db->get_where('pengajuan_proposal', ['nim' => $data['user']->nim], 1);
-        $proposal_data = $proposal_query->row_array();
+        $proposal_query = $this->db->get_where('pengajuan_proposal', ['nim' => $data['user']->nim]);
+        $proposals_data = $proposal_query->result_array();
         
-        if ($proposal_data) {
-            // Ambil nama dosen pembimbing
-            $dosen1 = $dosen2 = $dosen3 = null;
-            
-            if ($proposal_data['dosen1']) {
-                $dosen1_query = $this->db->get_where('dosen', ['id_dosen' => $proposal_data['dosen1']])->row_array();
-                if ($dosen1_query) {
-                    $dosen1 = $dosen1_query['nama_dos'] . ', ' . $dosen1_query['gelar'];
+        $data['proposals'] = [];
+        
+        if ($proposals_data) {
+            foreach ($proposals_data as $proposal_data) {
+                // Ambil nama dosen pembimbing
+                $dosen1 = $dosen2 = $dosen3 = null;
+                
+                if ($proposal_data['dosen1']) {
+                    $dosen1_query = $this->db->get_where('dosen', ['id_dosen' => $proposal_data['dosen1']])->row_array();
+                    if ($dosen1_query) {
+                        $dosen1 = $dosen1_query['nama_dos'] . ', ' . $dosen1_query['gelar'];
+                    }
                 }
-            }
-            
-            if ($proposal_data['dosen2']) {
-                $dosen2_query = $this->db->get_where('dosen', ['id_dosen' => $proposal_data['dosen2']])->row_array();
-                if ($dosen2_query) {
-                    $dosen2 = $dosen2_query['nama_dos'] . ', ' . $dosen2_query['gelar'];
+                
+                if ($proposal_data['dosen2']) {
+                    $dosen2_query = $this->db->get_where('dosen', ['id_dosen' => $proposal_data['dosen2']])->row_array();
+                    if ($dosen2_query) {
+                        $dosen2 = $dosen2_query['nama_dos'] . ', ' . $dosen2_query['gelar'];
+                    }
                 }
-            }
-            
-            if ($proposal_data['dosen3']) {
-                $dosen3_query = $this->db->get_where('dosen', ['id_dosen' => $proposal_data['dosen3']])->row_array();
-                if ($dosen3_query) {
-                    $dosen3 = $dosen3_query['nama_dos'] . ', ' . $dosen3_query['gelar'];
+                
+                if ($proposal_data['dosen3']) {
+                    $dosen3_query = $this->db->get_where('dosen', ['id_dosen' => $proposal_data['dosen3']])->row_array();
+                    if ($dosen3_query) {
+                        $dosen3 = $dosen3_query['nama_dos'] . ', ' . $dosen3_query['gelar'];
+                    }
                 }
+                
+                $data['proposals'][] = (object)[
+                    'id' => $proposal_data['id'],
+                    'judul' => $proposal_data['judul'],
+                    'link' => $proposal_data['link'],
+                    'dosen1' => $dosen1,
+                    'dosen2' => $dosen2,
+                    'dosen3' => $dosen3,
+                    'status' => $proposal_data['status'],
+                    'tanggal' => $proposal_data['tanggal']
+                ];
             }
-            
-            $data['proposal'] = (object)[
-                'nim' => $proposal_data['nim'],
-                'judul' => $proposal_data['judul'],
-                'link' => $proposal_data['link'],
-                'status' => $proposal_data['status'],
-                'tanggal' => $proposal_data['tanggal'],
-                'dosen1' => $dosen1,
-                'dosen2' => $dosen2,
-                'dosen3' => $dosen3
-            ];
-        } else {
-            // Jika tidak ada proposal, redirect ke halaman dashboard
-            redirect('mahasiswa/dashboard');
         }
+        
+        // Jika tidak ada proposal, set proposal pertama ke null
+        $data['proposal'] = !empty($data['proposals']) ? $data['proposals'][0] : null;
 
         $data['menu'] = 'dashboard';
         $data['css'] = 'detail_pengajuan';

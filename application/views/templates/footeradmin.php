@@ -37,33 +37,43 @@
 <!-- SCRIPT: Update Status Proposal -->
 <script>
 function updateStatus(status) {
-    let csrfName = '<?= $this->security->get_csrf_token_name(); ?>';
-    let csrfHash = '<?= $this->security->get_csrf_hash(); ?>';
     let id = $('#status_id').val();
+
+    console.log('UPDATE STATUS - ID:', id, 'Status:', status);
 
     $.ajax({
         url: "<?= base_url('pengajuan/updatestatus'); ?>",
         type: 'POST',
-        data: { [csrfName]: csrfHash, id: id, status: status },
+        data: { id: id, status: status },
         success: function(response) {
+            console.log('UPDATE STATUS - Response:', response);
             let res = typeof response === 'string' ? JSON.parse(response) : response;
             if (res.status) {
+                console.log('UPDATE STATUS - Success:', res.message);
                 $('#statusModal').modal('hide');
                 setTimeout(function() {
-                    if ($.fn.DataTable.isDataTable('#tableVerif')) {
-                        $('#tableVerif').DataTable().ajax.reload(null, false);
-                    } else if ($.fn.DataTable.isDataTable('#datatable-daftar')) {
+                    // Cek semua DataTables yang ada dan reload
+                    if ($.fn.DataTable.isDataTable('#datatable-daftar')) {
+                        console.log('UPDATE STATUS - Reloading #datatable-daftar');
                         $('#datatable-daftar').DataTable().ajax.reload(null, false);
-                    } else {
+                    }
+                    if ($.fn.DataTable.isDataTable('#tableVerif')) {
+                        console.log('UPDATE STATUS - Reloading #tableVerif');
+                        $('#tableVerif').DataTable().ajax.reload(null, false);
+                    }
+                    if (!$.fn.DataTable.isDataTable('#datatable-daftar') && !$.fn.DataTable.isDataTable('#tableVerif')) {
+                        console.log('UPDATE STATUS - No DataTables found, reloading page');
                         location.reload();
                     }
                 }, 300);
             } else {
-                alert('Gagal: ' + res.message);
+                console.log('UPDATE STATUS - Failed:', res.message);
+                alert('Gagal update status: ' + res.message);
             }
         },
-        error: function(xhr) {
-            alert('Terjadi kesalahan sistem.');
+        error: function(xhr, status, error) {
+            console.log('UPDATE STATUS - AJAX Error:', xhr.responseText, status, error);
+            alert('Terjadi kesalahan sistem. Silakan coba lagi.');
         }
     });
 }
@@ -79,27 +89,97 @@ $(document).on('click', '.btn-status', function(e) {
 <!-- SCRIPT: DataTables -->
 <script>
 $(document).ready(function () {
-
     // ===================== DAFTAR PROPOSAL =====================
     if ($('#datatable-daftar').length) {
-        $('#datatable-daftar').DataTable({
-            processing: true,
-            serverSide: true,
-            order: [],
-            ajax: {
-                url: '<?= base_url("pengajuan/getdaftar") ?>',
-                type: 'POST'
-            },
-            columns: [
+        // Cek jumlah kolom yang ada di tabel
+        var columnCount = $('#datatable-daftar thead th').length;
+        console.log('Jumlah kolom tabel:', columnCount);
+        
+        var columnsConfig = [];
+        var ajaxUrl = '';
+        
+        // Konfigurasi berdasarkan jumlah kolom
+        if (columnCount === 5) {
+            // Untuk admin/proposal.php (5 kolom)
+            columnsConfig = [
                 { data: 'no' },
                 { data: 'nim' },
                 { data: 'judul' },
                 { data: 'berkas' },
                 { data: 'status' }
-            ],
-            columnDefs: [
-                { targets: [0, 3, 4], orderable: false }
-            ]
+            ];
+            ajaxUrl = '<?= base_url("admin/getproposals") ?>';
+        } else if (columnCount === 10) {
+            // Untuk pengajuan/daftar_pengajuan.php (10 kolom)
+            columnsConfig = [
+                { data: 'no' },
+                { data: 'nim' },
+                { data: 'judul' },
+                { data: 'berkas' },
+                { data: 'dosen1' },
+                { data: 'dosen2' },
+                { data: 'dosen3' },
+                { data: 'status' },
+                { data: 'tanggal' },
+                { data: 'aksi' }
+            ];
+            ajaxUrl = '<?= base_url("pengajuan/getdaftar") ?>';
+        }
+        
+        $('#datatable-daftar').DataTable({
+            processing: true,
+            serverSide: true,
+            order: [],
+            ajax: {
+                url: ajaxUrl,
+                type: 'POST',
+                data: function (d) {
+                    console.log('DataTables Request Data:', d);
+                    return d;
+                },
+                error: function(xhr, error, thrown) {
+                    console.log('DataTables Error:', xhr.responseText);
+                    console.log('Status:', xhr.status);
+                    console.log('Error:', error);
+                }
+            },
+            columns: columnsConfig
+        });
+
+        // Buka modal edit daftar
+        $('#datatable-daftar tbody').on('click', '.btn-edit-daftar', function () {
+            var id = $(this).data('id');
+            $.ajax({
+                url: '<?= base_url("pengajuan/getdaftarrow") ?>',
+                type: 'POST',
+                data: { id: id },
+                success: function (res) {
+                    var data = typeof res === 'string' ? JSON.parse(res) : res;
+                    $('#e_id').val(data.id);
+                    $('#e_nim').val(data.nim);
+                    $('#e_judul').val(data.judul);
+                    $('#e_link').val(data.link);
+                    $('#e_dosen1_id').val(data.dosen1);
+                    $('#e_dosen2_id').val(data.dosen2);
+                    $('#e_dosen3_id').val(data.dosen3);
+                    $('#editdaftarModal').modal('show');
+                }
+            });
+        });
+
+        // Delete daftar
+        $('#datatable-daftar tbody').on('click', '.btn-delete-daftar', function () {
+            var id = $(this).data('id');
+            if (confirm('Yakin hapus data ini?')) {
+                $.ajax({
+                    url: '<?= base_url("pengajuan/deletedaftarrow") ?>',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function () {
+                        $('#datatable-daftar').DataTable().ajax.reload();
+                    }
+                });
+            }
         });
     }
 
@@ -244,5 +324,6 @@ $(document).ready(function () {
                     tableSiswa.ajax.reload();
                 }
             });
-        });
-    }
+        }); }
+});
+</script>

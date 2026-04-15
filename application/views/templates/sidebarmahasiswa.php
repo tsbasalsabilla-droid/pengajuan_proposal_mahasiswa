@@ -34,12 +34,6 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                 <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 3A1.5 1.5 0 001 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0115 5.293V4.5A1.5 1.5 0 0013.5 3h-11z"/><path d="M15 6.954L8.978 9.86a2.25 2.25 0 01-1.956 0L1 6.954V11.5A1.5 1.5 0 002.5 13h11a1.5 1.5 0 001.5-1.5V6.954z"/></svg>
             </span>
             <span class="nav-text">Pengajuan</span>
-            <?php
-            // Ganti dengan query DB untuk jumlah proposal pending
-            $pending = 3;
-            if ($pending > 0): ?>
-                <span class="nav-badge"><?= $pending ?></span>
-            <?php endif; ?>
         </a>
 
         <a href="detail_pengajuan" class="nav-item <?= $current_page === 'detail_pengajuan' ? 'active' : '' ?>">

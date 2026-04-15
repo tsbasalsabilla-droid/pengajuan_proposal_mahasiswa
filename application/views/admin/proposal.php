@@ -7,6 +7,47 @@
     float: none !important;
     text-align: left !important;
 }
+
+/* Atur lebar kolom agar tidak terpotong */
+#datatable-daftar {
+    width: 100% !important;
+    table-layout: fixed;
+}
+
+#datatable-daftar th:nth-child(1), #datatable-daftar td:nth-child(1) { 
+    width: 50px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(2), #datatable-daftar td:nth-child(2) { 
+    width: 120px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(3), #datatable-daftar td:nth-child(3) { 
+    width: auto; 
+    min-width: 300px;
+    max-width: 400px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+#datatable-daftar th:nth-child(4), #datatable-daftar td:nth-child(4) { 
+    width: 100px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(5), #datatable-daftar td:nth-child(5) { 
+    width: 120px; 
+    text-align: center;
+}
+
+/* Pastikan teks tidak terpotong */
+#datatable-daftar td {
+    word-wrap: break-word;
+    white-space: normal;
+    vertical-align: middle;
+}
+
+#datatable-daftar th:nth-child(3) {
+    text-align: left;
+}
 </style>
 
 <!-- Begin Page Content -->

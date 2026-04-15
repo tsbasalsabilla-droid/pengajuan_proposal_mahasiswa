@@ -1,3 +1,70 @@
+<style>
+/* Atur lebar kolom untuk 10 kolom */
+#datatable-daftar {
+    width: 100% !important;
+    table-layout: fixed;
+}
+
+#datatable-daftar th:nth-child(1), #datatable-daftar td:nth-child(1) { 
+    width: 50px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(2), #datatable-daftar td:nth-child(2) { 
+    width: 100px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(3), #datatable-daftar td:nth-child(3) { 
+    width: auto; 
+    min-width: 250px;
+    max-width: 350px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+#datatable-daftar th:nth-child(4), #datatable-daftar td:nth-child(4) { 
+    width: 100px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(5), #datatable-daftar td:nth-child(5) { 
+    width: 120px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(6), #datatable-daftar td:nth-child(6) { 
+    width: 120px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(7), #datatable-daftar td:nth-child(7) { 
+    width: 120px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(8), #datatable-daftar td:nth-child(8) { 
+    width: 100px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(9), #datatable-daftar td:nth-child(9) { 
+    width: 120px; 
+    text-align: center;
+}
+#datatable-daftar th:nth-child(10), #datatable-daftar td:nth-child(10) { 
+    width: 80px; 
+    text-align: center;
+}
+
+/* Pastikan teks tidak terpotong */
+#datatable-daftar td {
+    word-wrap: break-word;
+    white-space: normal;
+    vertical-align: middle;
+    padding: 8px;
+}
+
+#datatable-daftar th:nth-child(3),
+#datatable-daftar th:nth-child(5),
+#datatable-daftar th:nth-child(6),
+#datatable-daftar th:nth-child(7) {
+    text-align: left;
+}
+</style>
+
 <!-- Begin Page Content -->
   <div class="container-fluid">
 
@@ -108,35 +175,6 @@
       </div>
       </div>
 
-<script type="text/javascript">
-    var table;
-    $(document).ready(function() {
-        // Inisialisasi DataTables
-        $('#datatable-daftar').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "order": [],
-            "ajax": {
-                "url": "<?php echo base_url('pengajuan/getdaftar')?>",
-                "type": "POST"
-                // Jika pakai CSRF, tambahkan data token di sini seperti diskusi sebelumnya
-            },
-            "columns": [
-                { "data": "no" },
-                { "data": "nim" },
-                { "data": "judul" },
-                { "data": "berkas" },
-                { "data": "status" }
-            ],
-            "columnDefs": [
-                { 
-                    "targets": [0, 3, 4], 
-                    "orderable": false 
-                }
-            ]
-        });
-    });
-</script>
 
 <!-- Tambahkan modal status ke daftar_pengajuan.php (sebelum tag </div> penutup container) -->
 <div class="modal fade" id="statusModal" tabindex="-1" role="dialog">

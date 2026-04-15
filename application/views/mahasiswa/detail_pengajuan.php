@@ -50,40 +50,71 @@
                     <div style="color: #6B3EE8; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 0.5px;">Detail Proposal</div>
 
                     <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 8px;">Pilih Proposal</label>
+                        <select id="proposalSelector" style="width: 100%; background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #111; font-size: 14px; font-weight: 500;">
+                            <?php if (!empty($proposals)): ?>
+                                <?php foreach ($proposals as $index => $prop): ?>
+                                    <option value="<?= $index ?>" <?= ($proposal && $proposal->id == $prop->id) ? 'selected' : '' ?>>
+                                        <?= $prop->judul ?> (<?= date('d M Y', strtotime($prop->tanggal)) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="">Tidak ada proposal</option>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
                         <label style="display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 8px;">Judul Proposal</label>
-                        <div style="background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #111; font-size: 14px; line-height: 1.6; font-weight: 500;">
-                            <?= $proposal->judul; ?>
+                        <div id="proposalJudul" style="background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #111; font-size: 14px; line-height: 1.6; font-weight: 500;">
+                            <?= $proposal ? $proposal->judul : 'Tidak ada proposal' ?>
                         </div>
                     </div>
 
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 8px;">Link Dokumen</label>
-                        <a href="<?= $proposal->link; ?>" target="_blank" style="display: block; background: #fff; border: 1px solid #6B3EE8; padding: 10px 15px; border-radius: 8px; color: #6B3EE8; text-decoration: none; font-size: 13px; font-weight: 500; width: fit-content; transition: 0.2s;">
-                            Buka Tautan Proposal <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:5px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
-                        </a>
+                        <div id="proposalLink" style="display: block;">
+                            <?php if ($proposal && $proposal->link): ?>
+                                <a href="<?= $proposal->link; ?>" target="_blank" style="display: block; background: #fff; border: 1px solid #6B3EE8; padding: 10px 15px; border-radius: 8px; color: #6B3EE8; text-decoration: none; font-size: 13px; font-weight: 500; width: fit-content; transition: 0.2s;">
+                                    Buka Tautan Proposal <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:5px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                                </a>
+                            <?php else: ?>
+                                <div style="background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #999; font-size: 14px;">
+                                    Tidak ada link dokumen
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
 
-                    <?php if ($proposal->dosen1 || $proposal->dosen2 || $proposal->dosen3): ?>
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 8px;">Dosen Pembimbing</label>
-                        <div style="background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #666; font-size: 14px;">
+                        <div id="proposalDosen" style="background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #666; font-size: 14px;">
                             <?php 
-                            $dosen_list = [];
-                            if ($proposal->dosen1) $dosen_list[] = $proposal->dosen1;
-                            if ($proposal->dosen2) $dosen_list[] = $proposal->dosen2;
-                            if ($proposal->dosen3) $dosen_list[] = $proposal->dosen3;
-                            echo implode('<br>', $dosen_list);
+                            if ($proposal) {
+                                $dosen_list = [];
+                                if ($proposal->dosen1) $dosen_list[] = $proposal->dosen1;
+                                if ($proposal->dosen2) $dosen_list[] = $proposal->dosen2;
+                                if ($proposal->dosen3) $dosen_list[] = $proposal->dosen3;
+                                echo !empty($dosen_list) ? implode('<br>', $dosen_list) : 'Tidak ada dosen pembimbing';
+                            } else {
+                                echo 'Tidak ada dosen pembimbing';
+                            }
                             ?>
                         </div>
                     </div>
-                    <?php endif; ?>
 
                     <div style="margin-bottom: 10px;">
                         <label style="display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 8px;">Status Validasi</label>
-                        <span class="status-badge" style="
+                        <span id="proposalStatus" class="status-badge" style="
                             <?php 
-                            if ($proposal->status == 'sudah disetujui') {
-                                echo 'background: #ecfdf5; color: #10b981;';
+                            if ($proposal) {
+                                if ($proposal->status == 'Disetujui') {
+                                    echo 'background: #ecfdf5; color: #10b981;';
+                                } elseif ($proposal->status == 'Ditolak') {
+                                    echo 'background: #fef2f2; color: #ef4444;';
+                                } else {
+                                    echo 'background: #fff7ed; color: #f59e0b;';
+                                }
                             } else {
                                 echo 'background: #fff7ed; color: #f59e0b;';
                             }
@@ -91,14 +122,22 @@
                             padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
                             <span style="width: 6px; height: 6px; 
                                 <?php 
-                                if ($proposal->status == 'sudah disetujui') {
-                                    echo 'background: #10b981;';
+                                if ($proposal) {
+                                    if ($proposal->status == 'Disetujui') {
+                                        echo 'background: #10b981;';
+                                    } elseif ($proposal->status == 'Ditolak') {
+                                        echo 'background: #ef4444;';
+                                    } else {
+                                        echo 'background: #f59e0b;';
+                                    }
                                 } else {
                                     echo 'background: #f59e0b;';
                                 }
                                 ?>
                                 border-radius: 50%;"></span>
-                            <?= $proposal->status == 'sudah disetujui' ? 'Disetujui' : 'Sedang Diproses' ?>
+                            <span id="statusText">
+                                <?= $proposal ? ($proposal->status == 'Disetujui' ? 'Disetujui' : ($proposal->status == 'Ditolak' ? 'Ditolak' : 'Sedang Diproses')) : 'Sedang Diproses' ?>
+                            </span>
                         </span>
                     </div>
                 </div>
@@ -107,11 +146,87 @@
     </div>
 
     <script>
+        // Data proposal dari PHP
+        const proposalsData = <?= json_encode($proposals ?? []); ?>;
+        
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
+        
+        // Handle perubahan selector proposal
+        document.getElementById('proposalSelector').addEventListener('change', function() {
+            const selectedIndex = this.value;
+            const proposal = proposalsData[selectedIndex];
+            
+            if (proposal) {
+                // Update judul
+                document.getElementById('proposalJudul').textContent = proposal.judul || 'Tidak ada judul';
+                
+                // Update link dokumen
+                const linkContainer = document.getElementById('proposalLink');
+                if (proposal.link) {
+                    linkContainer.innerHTML = `
+                        <a href="${proposal.link}" target="_blank" style="display: block; background: #fff; border: 1px solid #6B3EE8; padding: 10px 15px; border-radius: 8px; color: #6B3EE8; text-decoration: none; font-size: 13px; font-weight: 500; width: fit-content; transition: 0.2s;">
+                            Buka Tautan Proposal <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:5px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                        </a>
+                    `;
+                } else {
+                    linkContainer.innerHTML = `
+                        <div style="background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #999; font-size: 14px;">
+                            Tidak ada link dokumen
+                        </div>
+                    `;
+                }
+                
+                // Update dosen pembimbing
+                const dosenContainer = document.getElementById('proposalDosen');
+                const dosenList = [];
+                if (proposal.dosen1) dosenList.push(proposal.dosen1);
+                if (proposal.dosen2) dosenList.push(proposal.dosen2);
+                if (proposal.dosen3) dosenList.push(proposal.dosen3);
+                dosenContainer.innerHTML = dosenList.length > 0 ? dosenList.join('<br>') : 'Tidak ada dosen pembimbing';
+                
+                // Update status
+                const statusContainer = document.getElementById('proposalStatus');
+                const statusText = document.getElementById('statusText');
+                const statusDot = statusContainer.querySelector('span:first-child');
+                
+                let bgColor, textColor, dotColor, statusLabel;
+                
+                if (proposal.status === 'Disetujui') {
+                    bgColor = '#ecfdf5';
+                    textColor = '#10b981';
+                    dotColor = '#10b981';
+                    statusLabel = 'Disetujui';
+                } else if (proposal.status === 'Ditolak') {
+                    bgColor = '#fef2f2';
+                    textColor = '#ef4444';
+                    dotColor = '#ef4444';
+                    statusLabel = 'Ditolak';
+                } else {
+                    bgColor = '#fff7ed';
+                    textColor = '#f59e0b';
+                    dotColor = '#f59e0b';
+                    statusLabel = 'Sedang Diproses';
+                }
+                
+                statusContainer.style.background = bgColor;
+                statusContainer.style.color = textColor;
+                statusDot.style.background = dotColor;
+                statusText.textContent = statusLabel;
+            } else {
+                // Reset ke default jika tidak ada proposal
+                document.getElementById('proposalJudul').textContent = 'Tidak ada proposal';
+                document.getElementById('proposalLink').innerHTML = `
+                    <div style="background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #999; font-size: 14px;">
+                        Tidak ada link dokumen
+                    </div>
+                `;
+                document.getElementById('proposalDosen').textContent = 'Tidak ada dosen pembimbing';
+            }
+        });
     </script>
 </body>
 </html>

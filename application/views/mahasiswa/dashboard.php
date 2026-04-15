@@ -260,7 +260,7 @@
                 <div style="font-size: 14px; color: #999; margin-bottom: 30px;">
                     Anda belum pernah mengajukan proposal. Klik tombol "Ajukan Proposal" untuk memulai.
                 </div>
-                <a href="<?= base_url('mahasiswa/index'); ?>" class="btn-primary" style="margin: 0 auto; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                <a href="<?= base_url('mahasiswa/pengajuan'); ?>" class="btn-primary" style="margin: 0 auto; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                     <svg class="icon" viewBox="0 0 14 14"><path d="M7 1v12M1 7h12"/></svg>
                     Ajukan Proposal
                 </a>

@@ -102,6 +102,62 @@ class Admin extends CI_Controller {
         $this->load->view('templates/footeradmin');
     }
 
+    public function getproposals()
+    {
+        header('Content-Type: application/json');
+        
+        $this->load->model('daftar_model');
+        
+        // Debug: Log request data
+        error_log("GETPROPOSALS REQUEST: " . print_r($_POST, true));
+        
+        $list = $this->daftar_model->get_datatables();
+        $data = [];
+        $no = isset($_POST['start']) ? (int)$_POST['start'] : 0;
+        
+        error_log("TOTAL RECORDS: " . $this->daftar_model->count_all());
+        error_log("FILTERED RECORDS: " . $this->daftar_model->count_filtered());
+
+        foreach ($list as $row) {
+            $no++;
+            
+            // Status badge dengan logic yang lebih baik
+            $status_text = !empty($row->status) ? $row->status : 'Pending';
+            $status_color = 'secondary'; // Default abu-abu
+            
+            if ($status_text == 'Disetujui') {
+                $status_color = 'success';
+            } elseif ($status_text == 'Ditolak') {
+                $status_color = 'danger';
+            } elseif ($status_text == 'Pending') {
+                $status_color = 'warning';
+            }
+
+            $status_badge = '
+<a href="javascript:void(0)" 
+   class="badge badge-'.$status_color.' btn-status" 
+   data-id="'.$row->id.'" 
+   style="font-size:13px; padding:6px 12px; border-radius:5px; cursor:pointer; text-decoration:none;">
+   '.$status_text.'
+</a>';
+            
+            $data[] = [
+                'no'          => $no,
+                'nim'         => $row->nim,
+                'judul'       => $row->judul,
+                'berkas'      => '<a href="'.$row->link.'" target="_blank" class="badge badge-info">Lihat Berkas</a>',
+                'status'      => $status_badge
+            ];
+        }
+
+        echo json_encode([
+            "draw"            => isset($_POST['draw']) ? (int)$_POST['draw'] : 0,
+            "recordsTotal"    => $this->daftar_model->count_all(),
+            "recordsFiltered" => $this->daftar_model->count_filtered(),
+            "data"            => $data
+        ]);
+    }
+
     public function changeaccess() {
         $menu_id = $this->input->post('menuId');
         $role_id = $this->input->post('roleId');
