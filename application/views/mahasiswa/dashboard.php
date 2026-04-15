@@ -105,6 +105,7 @@
         }
         .activity-item.purple::before { background: #6c3ce1; }
         .activity-item.green::before { background: #10b981; }
+        .activity-item.red::before { background: #ef4444; }
         .activity-text { font-size: 13px; color: #333; font-weight: 500; }
         .activity-time { font-size: 11px; color: #aaa; }
 
@@ -126,11 +127,26 @@
                     <div class="page-title">Dashboard</div>
                     <div class="page-sub">Selamat datang, <?= $this->session->userdata('nama'); ?></div>
                 </div>
+                <?php if ($proposals_disetujui == 0): ?>
                 <a href="<?= base_url('mahasiswa/pengajuan'); ?>" class="btn-primary" style="text-decoration: none;">
                     <svg class="icon" viewBox="0 0 14 14"><path d="M7 1v12M1 7h12"/></svg>
                     Ajukan Proposal
                 </a>
+                <?php endif; ?>
             </div>
+
+            <?php if ($proposals_disetujui > 0): ?>
+            <div style="background: #ecfdf5; border-left: 3px solid #10b981; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+                <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0;" viewBox="0 0 14 14" fill="none">
+                    <path d="M4.5 7l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <div>
+                    <div style="font-size: 14px; font-weight: 600; color: #10b981; margin-bottom: 2px;">Proposal Disetujui!</div>
+                    <div style="font-size: 12px; color: #059669;">Selamat! Proposal Anda telah disetujui. Anda dapat melihat detail di bawah.</div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <?php if ($sudah_pengajuan): ?>
             <div class="stats-grid">
@@ -162,7 +178,7 @@
                 <div class="card main-table">
                     <div class="card-head-flex">
                         <div class="card-title">Proposal Terbaru</div>
-                        <a href="#" class="view-all">Lihat semua</a>
+                        <a href="detail_pengajuan" class="view-all">Lihat semua</a>
                     </div>
                     <table class="data-table">
                         <thead>
@@ -186,9 +202,12 @@
                                 <td>
                                     <?php 
                                     $badge_class = '';
-                                    if ($proposal->status == 'sudah disetujui') {
+                                    if ($proposal->status == 'Disetujui' || $proposal->status == 'sudah disetujui') {
                                         $badge_class = 'badge-success';
                                         $status_text = 'Disetujui';
+                                    } elseif ($proposal->status == 'Ditolak' || $proposal->status == 'ditolak') {
+                                        $badge_class = 'badge-danger';
+                                        $status_text = 'Ditolak';
                                     } else {
                                         $badge_class = 'badge-warning';
                                         $status_text = 'Sedang diproses';
@@ -219,9 +238,17 @@
                             if ($activity_counter >= 3) break; // Tampilkan maksimal 3 aktivitas
                             $activity_counter++;
                         ?>
-                        <li class="activity-item <?= $proposal->status == 'sudah disetujui' ? 'green' : 'purple' ?>">
+                        <li class="activity-item <?= $proposal->status == 'Disetujui' || $proposal->status == 'sudah disetujui' ? 'green' : ($proposal->status == 'Ditolak' || $proposal->status == 'ditolak' ? 'red' : 'purple') ?>">
                             <div class="activity-text">
-                                <?= $proposal->status == 'sudah disetujui' ? 'Proposal Tugas Akhir disetujui' : 'Proposal Tugas Akhir baru diajukan' ?>
+                                <?php 
+                                if ($proposal->status == 'Disetujui' || $proposal->status == 'sudah disetujui') {
+                                    echo 'Proposal Tugas Akhir disetujui';
+                                } elseif ($proposal->status == 'Ditolak' || $proposal->status == 'ditolak') {
+                                    echo 'Proposal Tugas Akhir ditolak';
+                                } else {
+                                    echo 'Proposal Tugas Akhir baru diajukan';
+                                }
+                                ?>
                             </div>
                             <div class="activity-time">
                                 <?php 

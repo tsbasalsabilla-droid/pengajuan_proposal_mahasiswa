@@ -192,13 +192,16 @@
                 <circle cx="7" cy="7" r="6"/>
                 <path d="M7 4.5v3M7 9.5v.1"/>
             </svg>
-            <?php if ($sudah_pengajuan): ?>
+            <?php if ($sudah_disetujui): ?>
+                Selamat! Proposal Anda sudah disetujui. Anda tidak dapat mengajukan proposal baru.
+            <?php elseif ($sudah_pengajuan): ?>
                 Kamu sudah mengajukan proposal sebelumnya. Tinjau statusnya sebelum mengajukan yang baru.
             <?php else: ?>
                 Isi form pengajuan proposal dengan lengkap untuk mengajukan proposal baru.
             <?php endif; ?>
         </div>
 
+        <?php if (!$sudah_disetujui): ?>
         <div class="card">
             <form action="<?= base_url('mahasiswa/submit_pengajuan'); ?>" method="post">
             <div class="card-head">
@@ -307,6 +310,7 @@
             </div>
             </form>
         </div>
+        <?php endif; ?>
         </main>
     </div>
 
@@ -340,6 +344,75 @@
         if (window.innerWidth > 768 && localStorage.getItem('sidebarCollapsed') === 'true') {
             document.getElementById('sidebar').classList.add('collapsed');
         }
+        
+        // Dosen selection validation
+        const dosen1 = document.querySelector('select[name="dosen1"]');
+        const dosen2 = document.querySelector('select[name="dosen2"]');
+        const dosen3 = document.querySelector('select[name="dosen3"]');
+        
+        function updateDosenOptions() {
+            const selected1 = dosen1.value;
+            const selected2 = dosen2.value;
+            const selected3 = dosen3.value;
+            
+            // Update dosen2 options
+            Array.from(dosen2.options).forEach(option => {
+                if (option.value && (option.value === selected1 || option.value === selected3)) {
+                    option.disabled = true;
+                    option.style.color = '#ccc';
+                } else {
+                    option.disabled = false;
+                    option.style.color = '';
+                }
+            });
+            
+            // Update dosen3 options
+            Array.from(dosen3.options).forEach(option => {
+                if (option.value && (option.value === selected1 || option.value === selected2)) {
+                    option.disabled = true;
+                    option.style.color = '#ccc';
+                } else {
+                    option.disabled = false;
+                    option.style.color = '';
+                }
+            });
+            
+            // Update dosen1 options
+            Array.from(dosen1.options).forEach(option => {
+                if (option.value && (option.value === selected2 || option.value === selected3)) {
+                    option.disabled = true;
+                    option.style.color = '#ccc';
+                } else {
+                    option.disabled = false;
+                    option.style.color = '';
+                }
+            });
+        }
+        
+        dosen1.addEventListener('change', updateDosenOptions);
+        dosen2.addEventListener('change', updateDosenOptions);
+        dosen3.addEventListener('change', updateDosenOptions);
+        
+        // Form submission validation
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const selected1 = dosen1.value;
+            const selected2 = dosen2.value;
+            const selected3 = dosen3.value;
+            
+            // Check for duplicate selections
+            if (selected1 && (selected1 === selected2 || selected1 === selected3)) {
+                e.preventDefault();
+                alert('Dosen Penguji 1 tidak boleh sama dengan Dosen Penguji 2 atau 3');
+                return false;
+            }
+            
+            if (selected2 && selected2 === selected3) {
+                e.preventDefault();
+                alert('Dosen Penguji 2 tidak boleh sama dengan Dosen Penguji 3');
+                return false;
+            }
+        });
     });
     </script>
 </body>

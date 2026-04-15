@@ -50,12 +50,21 @@
                     <div style="color: #6B3EE8; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 0.5px;">Detail Proposal</div>
 
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 8px;">Pilih Proposal</label>
+                        <label style="display: block; font-size: 13px; font-weight: 500; color: #444; margin-bottom: 8px;">
+                            Pilih Proposal 
+                            <?php if (!empty($proposals)): ?>
+                                <span style="background: #6B3EE8; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;"><?= count($proposals) ?> Proposal</span>
+                            <?php endif; ?>
+                        </label>
                         <select id="proposalSelector" style="width: 100%; background: #fcfcfd; border: 1px solid #eef0f2; padding: 12px 15px; border-radius: 8px; color: #111; font-size: 14px; font-weight: 500;">
                             <?php if (!empty($proposals)): ?>
                                 <?php foreach ($proposals as $index => $prop): ?>
+                                    <?php 
+                                    $status_label = ($prop->status == 'Disetujui' || $prop->status == 'sudah disetujui') ? 'Disetujui' : (($prop->status == 'Ditolak' || $prop->status == 'ditolak') ? 'Ditolak' : 'Sedang Diproses');
+                                    $status_color = ($prop->status == 'Disetujui' || $prop->status == 'sudah disetujui') ? '#10b981' : (($prop->status == 'Ditolak' || $prop->status == 'ditolak') ? '#ef4444' : '#f59e0b');
+                                    ?>
                                     <option value="<?= $index ?>" <?= ($proposal && $proposal->id == $prop->id) ? 'selected' : '' ?>>
-                                        <?= $prop->judul ?> (<?= date('d M Y', strtotime($prop->tanggal)) ?>)
+                                        <?= $prop->judul ?> (<?= date('d M Y', strtotime($prop->tanggal)) ?>) - [<?= $status_label ?>]
                                     </option>
                                 <?php endforeach; ?>
                             <?php else: ?>
@@ -108,9 +117,9 @@
                         <span id="proposalStatus" class="status-badge" style="
                             <?php 
                             if ($proposal) {
-                                if ($proposal->status == 'Disetujui') {
+                                if ($proposal->status == 'Disetujui' || $proposal->status == 'sudah disetujui') {
                                     echo 'background: #ecfdf5; color: #10b981;';
-                                } elseif ($proposal->status == 'Ditolak') {
+                                } elseif ($proposal->status == 'Ditolak' || $proposal->status == 'ditolak') {
                                     echo 'background: #fef2f2; color: #ef4444;';
                                 } else {
                                     echo 'background: #fff7ed; color: #f59e0b;';
@@ -123,9 +132,9 @@
                             <span style="width: 6px; height: 6px; 
                                 <?php 
                                 if ($proposal) {
-                                    if ($proposal->status == 'Disetujui') {
+                                    if ($proposal->status == 'Disetujui' || $proposal->status == 'sudah disetujui') {
                                         echo 'background: #10b981;';
-                                    } elseif ($proposal->status == 'Ditolak') {
+                                    } elseif ($proposal->status == 'Ditolak' || $proposal->status == 'ditolak') {
                                         echo 'background: #ef4444;';
                                     } else {
                                         echo 'background: #f59e0b;';
@@ -136,7 +145,7 @@
                                 ?>
                                 border-radius: 50%;"></span>
                             <span id="statusText">
-                                <?= $proposal ? ($proposal->status == 'Disetujui' ? 'Disetujui' : ($proposal->status == 'Ditolak' ? 'Ditolak' : 'Sedang Diproses')) : 'Sedang Diproses' ?>
+                                <?= $proposal ? (($proposal->status == 'Disetujui' || $proposal->status == 'sudah disetujui') ? 'Disetujui' : (($proposal->status == 'Ditolak' || $proposal->status == 'ditolak') ? 'Ditolak' : 'Sedang Diproses')) : 'Sedang Diproses' ?>
                             </span>
                         </span>
                     </div>
@@ -195,12 +204,12 @@
                 
                 let bgColor, textColor, dotColor, statusLabel;
                 
-                if (proposal.status === 'Disetujui') {
+                if (proposal.status === 'Disetujui' || proposal.status === 'sudah disetujui') {
                     bgColor = '#ecfdf5';
                     textColor = '#10b981';
                     dotColor = '#10b981';
                     statusLabel = 'Disetujui';
-                } else if (proposal.status === 'Ditolak') {
+                } else if (proposal.status === 'Ditolak' || proposal.status === 'ditolak') {
                     bgColor = '#fef2f2';
                     textColor = '#ef4444';
                     dotColor = '#ef4444';

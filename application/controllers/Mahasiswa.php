@@ -81,6 +81,19 @@ class Mahasiswa extends CI_Controller {
         $proposal_query = $this->db->get_where('pengajuan_proposal', ['nim' => $data['user']->nim]);
         $data['sudah_pengajuan'] = $proposal_query->num_rows() > 0;
         
+        // Cek apakah user sudah memiliki proposal yang disetujui
+        $approved_disetujui = $this->db->get_where('pengajuan_proposal', [
+            'nim' => $data['user']->nim,
+            'status' => 'Disetujui'
+        ])->num_rows();
+        
+        $approved_sudah = $this->db->get_where('pengajuan_proposal', [
+            'nim' => $data['user']->nim,
+            'status' => 'sudah disetujui'
+        ])->num_rows();
+        
+        $data['sudah_disetujui'] = ($approved_disetujui > 0 || $approved_sudah > 0);
+        
         $data['css'] = 'pengajuan';
 
         $data['menu'] = 'dashboard';
@@ -99,6 +112,19 @@ class Mahasiswa extends CI_Controller {
     $dosen2 = $this->input->post('dosen2');
     $dosen3 = $this->input->post('dosen3');
     
+    // Validasi: Cek apakah ada dosen yang dipilih lebih dari sekali
+    if ($dosen1 && ($dosen1 == $dosen2 || $dosen1 == $dosen3)) {
+        $this->session->set_flashdata('message', '<div class="alert alert-danger">Dosen Penguji 1 tidak boleh sama dengan Dosen Penguji 2 atau 3</div>');
+        redirect('mahasiswa/pengajuan');
+        return;
+    }
+    
+    if ($dosen2 && $dosen2 == $dosen3) {
+        $this->session->set_flashdata('message', '<div class="alert alert-danger">Dosen Penguji 2 tidak boleh sama dengan Dosen Penguji 3</div>');
+        redirect('mahasiswa/pengajuan');
+        return;
+    }
+    
     // 2. Ambil data user dari session
     $email = $this->session->userdata('email');
     $user_data = $this->db->get_where('user', ['email' => $email])->row_array();
@@ -109,6 +135,23 @@ class Mahasiswa extends CI_Controller {
         
         if ($mahasiswa_data) {
             $nim = $mahasiswa_data['nim'];
+            
+            // Validasi: Cek apakah mahasiswa sudah memiliki proposal yang disetujui
+            $approved_proposal_disetujui = $this->db->get_where('pengajuan_proposal', [
+                'nim' => $nim,
+                'status' => 'Disetujui'
+            ])->num_rows();
+            
+            $approved_proposal_sudah = $this->db->get_where('pengajuan_proposal', [
+                'nim' => $nim,
+                'status' => 'sudah disetujui'
+            ])->num_rows();
+            
+            if ($approved_proposal_disetujui > 0 || $approved_proposal_sudah > 0) {
+                $this->session->set_flashdata('message', '<div class="alert alert-danger">Anda tidak dapat mengajukan proposal baru karena sudah memiliki proposal yang disetujui.</div>');
+                redirect('mahasiswa/dashboard');
+                return;
+            }
 
             // 3. Siapkan data untuk dimasukkan ke tabel pengajuan_proposal
             $data_insert = [
@@ -118,7 +161,7 @@ class Mahasiswa extends CI_Controller {
                 'dosen1'  => $dosen1,
                 'dosen2'  => $dosen2,
                 'dosen3'  => $dosen3,
-                'status'  => 'belum disetujui', // Status awal
+                'status'  => 'Pending', // Status awal
                 'tanggal' => date('Y-m-d H:i:s')
             ];
 
@@ -285,9 +328,11 @@ class Mahasiswa extends CI_Controller {
         $data['proposals_aktif'] = 0;
         
         foreach ($data['proposals'] as $proposal) {
-            if ($proposal->status == 'sudah disetujui') {
+            if ($proposal->status == 'Disetujui' || $proposal->status == 'sudah disetujui') {
                 $data['proposals_disetujui']++;
-            } elseif ($proposal->status == 'belum disetujui') {
+            } elseif ($proposal->status == 'Ditolak' || $proposal->status == 'ditolak') {
+                $data['proposals_ditolak']++;
+            } elseif ($proposal->status == 'Pending' || $proposal->status == 'belum disetujui') {
                 $data['proposals_aktif']++;
             }
         }
