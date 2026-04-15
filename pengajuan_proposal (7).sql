@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 08, 2026 at 05:21 AM
+-- Generation Time: Apr 08, 2026 at 11:10 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -65,7 +65,8 @@ CREATE TABLE `mahasiswa` (
 
 INSERT INTO `mahasiswa` (`id_mahasiswa`, `nim`, `nama`, `prodi_id`, `user_id`) VALUES
 (1, '230101001', 'Valentina Mcphee', 12, NULL),
-(2, '250719476', 'Dodi Putra Mahesa', 5, 1);
+(2, '250719476', 'Dodi Putra Mahesa', 5, 1),
+(17, '504279536', 'Valerina Burj', 13, 11);
 
 -- --------------------------------------------------------
 
@@ -150,7 +151,8 @@ INSERT INTO `user` (`id`, `name`, `email`, `password`, `role_id`, `is_active`) V
 (4, 'Bilqis Tsabitah', 'salsabilla@gmail.com', '$2y$10$9dLfrWAqCcuYsYmxvaRpsusAeB8uN9xESRedShYM0Lv.JPewk.6Ie', 3, 1),
 (5, 'Budi Cahyono', 'budicah@gmail.com', '$2y$10$s.//kR3wGseqb5M3L14rs.EkhBmNe3U2uKUEwfJw4LgFFK8p24NOe', 3, 1),
 (8, 'Yayan Suliato', 'yayan@gmail.com', '$2y$10$sijCYR5SSqKkhIAJVGmoLezDf6v6UIh0u00rkMfC4sDMSa/jZnpPC', 3, 1),
-(9, 'Sisil Putri Cahyono', 'sisil@gmail.com', '$2y$10$47/vvsjQix0IpljJIUuUNeW5nHkhZ.cVux/F90Wqa5l9NCyueGdtq', 3, 1);
+(9, 'Sisil Putri Cahyono', 'sisil@gmail.com', '$2y$10$47/vvsjQix0IpljJIUuUNeW5nHkhZ.cVux/F90Wqa5l9NCyueGdtq', 3, 1),
+(11, 'Valerina Burj', 'valerina@gmail.com', '$2y$10$ixJuRZphLdlJmuK/mQwT3ewQ4b8n7Iwb3KT7I4Hl0WLornrLb9zVm', 2, 1);
 
 -- --------------------------------------------------------
 
@@ -174,8 +176,8 @@ INSERT INTO `user_access_menu` (`id`, `menu_id`, `role_id`) VALUES
 (8, 4, 3),
 (9, 4, 1),
 (10, 2, 1),
-(11, 3, 1),
-(16, 5, 1);
+(16, 5, 1),
+(30, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -194,9 +196,9 @@ CREATE TABLE `user_menu` (
 
 INSERT INTO `user_menu` (`id`, `menu`) VALUES
 (1, 'Dashboard '),
-(2, 'Data'),
-(3, 'Proposal'),
-(4, 'Admin'),
+(2, 'Dosen'),
+(3, 'Mahasiswa'),
+(4, 'Pengajuan'),
 (5, 'Role Access');
 
 -- --------------------------------------------------------
@@ -314,19 +316,19 @@ ALTER TABLE `user_sub_menu`
 -- AUTO_INCREMENT for table `dosen`
 --
 ALTER TABLE `dosen`
-  MODIFY `id_dosen` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id_dosen` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `mahasiswa`
 --
 ALTER TABLE `mahasiswa`
-  MODIFY `id_mahasiswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_mahasiswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `pengajuan_proposal`
 --
 ALTER TABLE `pengajuan_proposal`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `prodi`
@@ -338,13 +340,13 @@ ALTER TABLE `prodi`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `user_access_menu`
 --
 ALTER TABLE `user_access_menu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `user_menu`
